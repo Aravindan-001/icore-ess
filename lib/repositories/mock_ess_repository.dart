@@ -56,24 +56,24 @@ class MockEssRepository implements EssRepository {
   }
 
   @override
-  Future<bool> checkIn(DateTime time) async {
+  Future<bool> checkIn(AttendanceRequest request) async {
     await Future.delayed(const Duration(seconds: 1));
     if (_todayAttendance.status != AttendanceStatus.notMarked) return false;
     
     _todayAttendance = _todayAttendance.copyWith(
-      checkInTime: time,
+      checkInTime: request.deviceTime,
       status: AttendanceStatus.checkedIn,
     );
     return true;
   }
 
   @override
-  Future<bool> checkOut(DateTime time) async {
+  Future<bool> checkOut(AttendanceRequest request) async {
     await Future.delayed(const Duration(seconds: 1));
     if (_todayAttendance.status != AttendanceStatus.checkedIn) return false;
     
     _todayAttendance = _todayAttendance.copyWith(
-      checkOutTime: time,
+      checkOutTime: request.deviceTime,
       status: AttendanceStatus.checkedOut,
     );
     return true;

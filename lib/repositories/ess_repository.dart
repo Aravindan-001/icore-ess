@@ -13,6 +13,6 @@ abstract class EssRepository {
   
   // Attendance methods
   Future<AttendanceRecord> getTodayAttendance();
-  Future<bool> checkIn(DateTime time);
-  Future<bool> checkOut(DateTime time);
+  Future<bool> checkIn(AttendanceRequest request);
+  Future<bool> checkOut(AttendanceRequest request);
 }

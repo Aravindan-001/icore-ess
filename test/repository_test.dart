@@ -42,17 +42,27 @@ void main() {
 
     test('Attendance sequential rules', () async {
       final now = DateTime.now();
+      final request = AttendanceRequest(
+        employeeId: 'EMP001',
+        action: 'CHECK_IN',
+        deviceTime: now,
+        latitude: 0,
+        longitude: 0,
+        accuracy: 0,
+        isMocked: false,
+        appVersion: '1.0.0',
+      );
       
       // Initial state
       final initial = await repository.getTodayAttendance();
       expect(initial.status, AttendanceStatus.notMarked);
       
       // Cannot check out if not marked
-      final checkOutFail = await repository.checkOut(now);
+      final checkOutFail = await repository.checkOut(request);
       expect(checkOutFail, isFalse);
       
       // Check in
-      final checkInSuccess = await repository.checkIn(now);
+      final checkInSuccess = await repository.checkIn(request);
       expect(checkInSuccess, isTrue);
       
       final afterIn = await repository.getTodayAttendance();
@@ -60,11 +70,23 @@ void main() {
       expect(afterIn.checkInTime, now);
       
       // Cannot check in again
-      final checkInFail = await repository.checkIn(now);
+      final checkInFail = await repository.checkIn(request);
       expect(checkInFail, isFalse);
       
       // Check out
-      final checkOutSuccess = await repository.checkOut(now);
+      final checkOutRequest = AttendanceRequest(
+        employeeId: 'EMP001',
+        action: 'CHECK_OUT',
+        deviceTime: now,
+        latitude: 0,
+        longitude: 0,
+        accuracy: 0,
+        isMocked: false,
+        appVersion: '1.0.0',
+      );
+      
+      // Check out
+      final checkOutSuccess = await repository.checkOut(checkOutRequest);
       expect(checkOutSuccess, isTrue);
       
       final afterOut = await repository.getTodayAttendance();
@@ -72,11 +94,11 @@ void main() {
       expect(afterOut.checkOutTime, now);
       
       // Cannot check out again
-      final checkOutFail2 = await repository.checkOut(now);
+      final checkOutFail2 = await repository.checkOut(checkOutRequest);
       expect(checkOutFail2, isFalse);
       
       // Cannot check in after completion
-      final checkInFail2 = await repository.checkIn(now);
+      final checkInFail2 = await repository.checkIn(request);
       expect(checkInFail2, isFalse);
     });
 

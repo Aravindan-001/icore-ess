@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/dependency_injection.dart';
 import '../../models/attendance.dart';
@@ -73,7 +74,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
     setState(() => _isProcessing = true);
     try {
-      final success = await DependencyInjection.repository.checkIn(DateTime.now());
+      final employee = await DependencyInjection.repository.getEmployeeProfile();
+      final request = AttendanceRequest(
+        employeeId: employee.id,
+        action: 'CHECK_IN',
+        deviceTime: DateTime.now(),
+        latitude: location.latitude,
+        longitude: location.longitude,
+        accuracy: location.accuracy,
+        isMocked: location.isMocked,
+        appVersion: AppConstants.appVersion,
+      );
+
+      final success = await DependencyInjection.repository.checkIn(request);
       if (success) {
         await _refreshData();
         if (mounted) {
@@ -111,7 +124,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
     setState(() => _isProcessing = true);
     try {
-      final success = await DependencyInjection.repository.checkOut(DateTime.now());
+      final employee = await DependencyInjection.repository.getEmployeeProfile();
+      final request = AttendanceRequest(
+        employeeId: employee.id,
+        action: 'CHECK_OUT',
+        deviceTime: DateTime.now(),
+        latitude: location.latitude,
+        longitude: location.longitude,
+        accuracy: location.accuracy,
+        isMocked: location.isMocked,
+        appVersion: AppConstants.appVersion,
+      );
+
+      final success = await DependencyInjection.repository.checkOut(request);
       if (success) {
         await _refreshData();
         if (mounted) {

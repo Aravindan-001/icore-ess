@@ -30,3 +30,38 @@ class AttendanceRecord {
     );
   }
 }
+
+class AttendanceRequest {
+  final String employeeId;
+  final String action; // 'CHECK_IN' or 'CHECK_OUT'
+  final DateTime deviceTime;
+  final double latitude;
+  final double longitude;
+  final double accuracy;
+  final bool isMocked;
+  final String appVersion;
+
+  AttendanceRequest({
+    required this.employeeId,
+    required this.action,
+    required this.deviceTime,
+    required this.latitude,
+    required this.longitude,
+    required this.accuracy,
+    required this.isMocked,
+    required this.appVersion,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'employeeId': employeeId,
+      'action': action,
+      'deviceTime': deviceTime.toIso8601String(),
+      'latitude': latitude,
+      'longitude': longitude,
+      'accuracy': accuracy,
+      'isMocked': isMocked,
+      'appVersion': appVersion,
+    };
+  }
+}

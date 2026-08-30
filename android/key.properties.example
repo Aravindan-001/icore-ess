@@ -1,4 +1,4 @@
-storePassword=password
-keyPassword=password
-keyAlias=upload
-storeFile=../app/upload-keystore.jks
+storePassword=YOUR_STORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=YOUR_KEY_ALIAS
+storeFile=YOUR_KEYSTORE_FILE_PATH (e.g., upload-keystore.jks)

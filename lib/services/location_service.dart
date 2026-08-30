@@ -8,6 +8,7 @@ class LocationResult {
   final double accuracy;
   final double distanceFromOffice;
   final bool isWithinGeofence;
+  final bool isMocked;
   final String? errorMessage;
   final bool isPermissionDenied;
   final bool isPermissionDeniedForever;
@@ -19,6 +20,7 @@ class LocationResult {
     required this.accuracy,
     required this.distanceFromOffice,
     required this.isWithinGeofence,
+    this.isMocked = false,
     this.errorMessage,
     this.isPermissionDenied = false,
     this.isPermissionDeniedForever = false,
@@ -36,6 +38,7 @@ class LocationResult {
       accuracy: 0,
       distanceFromOffice: double.infinity,
       isWithinGeofence: false,
+      isMocked: false,
       errorMessage: message,
       isPermissionDenied: isPermissionDenied,
       isPermissionDeniedForever: isPermissionDeniedForever,
@@ -152,6 +155,7 @@ class GeolocatorLocationService with LocationCalculator implements LocationServi
         accuracy: position.accuracy,
         distanceFromOffice: distance,
         isWithinGeofence: distance <= AppConstants.allowedRadiusInMeters,
+        isMocked: position.isMocked,
       );
     } catch (e) {
       return LocationResult.error('Failed to get location: $e');
