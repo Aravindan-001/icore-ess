@@ -1,6 +1,6 @@
 {
-    "name": "icore_ess",
-    "short_name": "icore_ess",
+    "name": "iCore ESS",
+    "short_name": "iCore ESS",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

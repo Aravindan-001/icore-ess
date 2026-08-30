@@ -13,6 +13,8 @@ class MockEssRepository implements EssRepository {
 
   @override
   Future<bool> login(String employeeId, String password) async {
+    // DEVELOPMENT MOCK ONLY: Real authentication will use SOAP/XML services.
+    // Integration point for Session Security: Store returned AuthToken/SessionID in flutter_secure_storage.
     await Future.delayed(const Duration(seconds: 1));
     return employeeId == 'EMP001' && password == '123456';
   }

@@ -41,7 +41,13 @@ class PayslipScreen extends StatelessWidget {
                           _buildSalaryRow('Net Salary', payslip.netSalary, isTotal: true),
                           const SizedBox(height: 16),
                           OutlinedButton.icon(
-                            onPressed: () {},
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('PDF download will be available when the payslip service is integrated.'),
+                                ),
+                              );
+                            },
                             icon: const Icon(Icons.download),
                             label: const Text('Download PDF'),
                             style: OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 45)),

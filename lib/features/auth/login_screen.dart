@@ -60,17 +60,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 Center(
                   child: Column(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppTheme.primaryBlue,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Icon(
-                          Icons.business_center,
-                          color: AppTheme.white,
-                          size: 48,
-                        ),
+                      Image.asset(
+                        'assets/images/ebaconnect_logo.png',
+                        height: 100,
+                        fit: BoxFit.contain,
                       ),
                       const SizedBox(height: 16),
                       Text(
