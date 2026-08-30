@@ -1,10 +1,10 @@
-# iCore ESS
+# ebaConnect
 
 Employee Self-Service (ESS) mobile application built with Flutter.
 
 ## Overview
 
-iCore ESS is a mobile Employee Self-Service application designed to provide employees with a centralized platform for accessing HR and workplace services.
+ebaConnect is a mobile Employee Self-Service application designed to provide employees with a centralized platform for accessing HR and workplace services.
 
 The application currently contains a complete frontend prototype with mock data and a repository-based architecture prepared for future SOAP/XML backend integration.
 

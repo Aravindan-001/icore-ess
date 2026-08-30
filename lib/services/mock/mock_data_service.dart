@@ -6,7 +6,7 @@ class MockDataService {
   static final Employee mockEmployee = Employee(
     id: 'EMP001',
     name: 'Aravind Kumar',
-    email: 'aravind.kumar@icore.com',
+    email: 'aravind.kumar@ebaconnect.com',
     phone: '+91 9876543210',
     department: 'Information Technology',
     designation: 'Software Engineer',

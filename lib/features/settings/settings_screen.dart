@@ -48,7 +48,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const _SettingsSection(title: 'App Info'),
           ListTile(
-            title: const Text('About iCore ESS'),
+            title: const Text('About ebaConnect'),
             subtitle: const Text('Version 1.0.0'),
             onTap: () {},
           ),

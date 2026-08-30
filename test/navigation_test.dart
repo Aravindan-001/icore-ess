@@ -18,7 +18,7 @@ void main() {
     await tester.tap(find.text('Login'));
     await tester.pumpAndSettle(const Duration(seconds: 2));
 
-    expect(find.text('iCore ESS'), findsWidgets);
+    expect(find.text('ebaConnect'), findsWidgets);
 
     await tester.tap(find.byIcon(Icons.grid_view_outlined));
     await tester.pumpAndSettle();

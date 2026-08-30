@@ -13,7 +13,7 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('iCore ESS'),
+        title: const Text('ebaConnect'),
         actions: [
           IconButton(
             icon: const Icon(Icons.account_circle),

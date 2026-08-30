@@ -64,7 +64,7 @@ void main() {
       await tester.pumpAndSettle(const Duration(seconds: 2));
 
       // Verify Dashboard content
-      expect(find.text('iCore ESS'), findsWidgets);
+      expect(find.text('ebaConnect'), findsWidgets);
       expect(find.text('Aravind Kumar'), findsOneWidget);
       expect(find.text('Leave Summary'), findsOneWidget);
       expect(find.text('Services'), findsWidgets);

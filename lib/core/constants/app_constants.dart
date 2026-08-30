@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String appName = 'iCore ESS';
+  static const String appName = 'ebaConnect';
   static const String appVersion = '1.0.0';
   
   // Navigation Routes
