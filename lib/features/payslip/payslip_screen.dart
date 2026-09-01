@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/dependency_injection.dart';
+import '../../core/widgets/empty_state.dart';
 import '../../models/payslip.dart';
 
 class PayslipScreen extends StatelessWidget {
@@ -20,6 +21,13 @@ class PayslipScreen extends StatelessWidget {
             return const Center(child: Text('Error loading payslips'));
           }
           final payslips = snapshot.data!;
+          if (payslips.isEmpty) {
+            return const EmptyState(
+              title: 'No Payslips',
+              message: 'Your payslips will appear here once they are generated.',
+              icon: Icons.receipt_long_outlined,
+            );
+          }
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: payslips.length,

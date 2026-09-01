@@ -6,6 +6,7 @@ import 'test_utils.dart';
 
 void main() {
   HttpOverrides.global = MockHttpOverrides();
+  setupSecureStorageMock();
 
   group('Expenses Modules QA', () {
     testWidgets('Reimbursement screen verification', (WidgetTester tester) async {

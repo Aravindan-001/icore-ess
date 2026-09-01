@@ -8,6 +8,7 @@ class CustomTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
   final Widget? suffixIcon;
+  final Key? textFieldKey;
 
   const CustomTextField({
     super.key,
@@ -18,11 +19,13 @@ class CustomTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.validator,
     this.suffixIcon,
+    this.textFieldKey,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      key: textFieldKey ?? Key('field_$label'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(

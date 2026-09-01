@@ -6,6 +6,7 @@ import 'test_utils.dart';
 
 void main() {
   HttpOverrides.global = MockHttpOverrides();
+  setupSecureStorageMock();
 
   group('Payroll Modules QA', () {
     testWidgets('Payslip screen verification', (WidgetTester tester) async {
@@ -44,7 +45,8 @@ void main() {
       await tester.pumpAndSettle(const Duration(seconds: 2));
 
       await tester.tap(find.text('Pay Summary'));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pumpAndSettle(const Duration(seconds: 1));
 
       expect(find.text('Pay Summary'), findsWidgets);
       expect(find.text('Annual Gross Pay'), findsOneWidget);

@@ -36,13 +36,14 @@ dependencies:
   cupertino_icons: ^1.0.8
   google_fonts: ^8.2.1
   intl: ^0.20.3
-  geolocator: ^13.0.1
-  flutter_secure_storage: ^9.2.2
+  geolocator: ^13.0.4
+  flutter_secure_storage: ^9.2.4
+  flutter_native_splash: ^2.4.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.4
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -97,3 +98,14 @@ flutter_launcher_icons:
   ios: true
   image_path: "assets/images/ebaconnect_logo.png"
   min_sdk_android: 21
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: "assets/images/ebaconnect_logo.png"
+  android: true
+  ios: true
+  android_12:
+    color: "#ffffff"
+    image: "assets/images/ebaconnect_logo.png"
+  android_gravity: center
+  ios_content_mode: center

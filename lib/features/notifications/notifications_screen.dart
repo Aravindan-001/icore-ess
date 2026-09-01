@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/dependency_injection.dart';
+import '../../core/widgets/empty_state.dart';
+import '../../models/notification.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -8,40 +12,68 @@ class NotificationsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Notifications')),
-      body: ListView.separated(
-        itemCount: 5,
-        separatorBuilder: (context, index) => const Divider(height: 1),
-        itemBuilder: (context, index) {
-          final titles = [
-            'Leave Approved',
-            'Payslip Available',
-            'Reimbursement Paid',
-            'Policy Update',
-            'Holiday Reminder'
-          ];
-          final messages = [
-            'Your leave request for 20th Jan has been approved.',
-            'Your payslip for May 2024 is now available for download.',
-            'Reimbursement of ₹1,500 has been processed.',
-            'New insurance policy details have been uploaded.',
-            'Coming up: Eid-ul-Adha holiday on 17th June.'
-          ];
-          
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundColor: index < 2 ? AppTheme.primaryBlue.withValues(alpha: 0.1) : Colors.transparent,
-              child: Icon(
-                index < 2 ? Icons.notifications_active : Icons.notifications_none,
-                color: index < 2 ? AppTheme.primaryBlue : AppTheme.textGrey,
-              ),
-            ),
-            title: Text(titles[index], style: TextStyle(fontWeight: index < 2 ? FontWeight.bold : FontWeight.normal)),
-            subtitle: Text(messages[index]),
-            trailing: const Text('2h ago', style: TextStyle(fontSize: 10, color: AppTheme.textGrey)),
-            onTap: () {},
+      body: FutureBuilder<List<AppNotification>>(
+        future: DependencyInjection.repository.getNotifications(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return const Center(child: Text('Error loading notifications'));
+          }
+
+          final notifications = snapshot.data!;
+          if (notifications.isEmpty) {
+            return const EmptyState(
+              title: 'No Notifications',
+              message: 'You are all caught up!',
+              icon: Icons.notifications_none_outlined,
+            );
+          }
+
+          return ListView.separated(
+            itemCount: notifications.length,
+            separatorBuilder: (context, index) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final item = notifications[index];
+              final isRead = item.isRead;
+              
+              return ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: !isRead ? AppTheme.primaryBlue.withValues(alpha: 0.1) : Colors.transparent,
+                  child: Icon(
+                    !isRead ? Icons.notifications_active : Icons.notifications_none,
+                    color: !isRead ? AppTheme.primaryBlue : AppTheme.textGrey,
+                  ),
+                ),
+                title: Text(
+                  item.title, 
+                  style: TextStyle(fontWeight: !isRead ? FontWeight.bold : FontWeight.normal)
+                ),
+                subtitle: Text(item.message),
+                trailing: Text(
+                  _formatTimestamp(item.timestamp), 
+                  style: const TextStyle(fontSize: 10, color: AppTheme.textGrey)
+                ),
+                onTap: () {},
+              );
+            },
           );
         },
       ),
     );
+  }
+
+  String _formatTimestamp(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    if (difference.inMinutes < 60) {
+      return '${difference.inMinutes}m ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours}h ago';
+    } else {
+      return DateFormat('dd MMM').format(timestamp);
+    }
   }
 }

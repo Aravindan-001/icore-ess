@@ -21,6 +21,7 @@ class ErrorLocationService extends MockLocationService {
 
 void main() {
   HttpOverrides.global = MockHttpOverrides();
+  setupSecureStorageMock();
 
   group('Attendance Permission UI Tests', () {
     late ErrorLocationService errorLocationService;

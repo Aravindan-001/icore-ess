@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/session_manager.dart';
+import 'change_password_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -44,7 +46,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             title: const Text('Change Password'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ChangePasswordScreen()),
+              );
+            },
           ),
           const _SettingsSection(title: 'App Info'),
           ListTile(
@@ -52,15 +59,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: const Text('Version 1.0.0'),
             onTap: () {},
           ),
-          ListTile(
-            title: const Text('Privacy Policy'),
-            onTap: () {},
-          ),
           const SizedBox(height: 24),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: TextButton(
-              onPressed: () => Navigator.pushReplacementNamed(context, AppConstants.loginRoute),
+              onPressed: () {
+                ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                SessionManager.clearSession();
+                Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
+                  AppConstants.loginRoute, 
+                  (route) => false,
+                );
+              },
               child: const Text('Logout', style: TextStyle(color: AppTheme.error)),
             ),
           ),

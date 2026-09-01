@@ -3,7 +3,7 @@ class AppConstants {
   static const String appVersion = '1.0.0';
   
   // Navigation Routes
-  static const String loginRoute = '/login';
+  static const String loginRoute = '/';
   static const String dashboardRoute = '/dashboard';
   static const String mainRoute = '/main';
   static const String profileRoute = '/profile';

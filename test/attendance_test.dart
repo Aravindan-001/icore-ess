@@ -9,6 +9,7 @@ import 'test_utils.dart';
 
 void main() {
   HttpOverrides.global = MockHttpOverrides();
+  setupSecureStorageMock();
 
   group('Attendance Module Regression Tests', () {
     late MockLocationService locationService;

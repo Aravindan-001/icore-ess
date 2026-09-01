@@ -52,4 +52,26 @@ For each of the following, provide Request/Response XML examples:
 - **VPN**: Specify if a corporate VPN is required for the app to reach the endpoints.
 
 ---
-**Current Status**: Flutter architecture is prepared with `SoapEssRepository` and `SoapClient` placeholders. Implementation will commence upon receipt of the above items.
+**Current Status**: Backend Integration Ready — Awaiting Client SOAP/WSDL Contract.
+
+## 6. Client Backend Requirements Checklist
+Please provide the following to proceed with the integration:
+
+- [ ] **WSDL file or WSDL URL**
+- [ ] **UAT SOAP endpoint URL**
+- [ ] **Production SOAP endpoint URL**
+- [ ] **Available SOAP operations** (Login, CheckIn, GetProfile, etc.)
+- [ ] **XML Namespaces** used in SOAP envelopes
+- [ ] **SOAP Headers** required for authentication/session
+- [ ] **Authentication mechanism** (Basic, Token, Session ID)
+- [ ] **Sample Login request/response XML**
+- [ ] **Sample Attendance request/response XML**
+- [ ] **Sample Leave request/response XML**
+- [ ] **Sample Payslip request/response XML**
+- [ ] **Sample Employee/Profile request/response XML**
+- [ ] **SOAP Fault examples** for various error cases
+- [ ] **Test/UAT credentials** (Employee ID and Password)
+- [ ] **VPN/Network requirements** (if services are internal)
+- [ ] **SSL/Certificate requirements** (Custom CA or pinning)
+- [ ] **Server-side attendance/geofence rules**
+- [ ] **Office coordinates and allowed radius** for server validation

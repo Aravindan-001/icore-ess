@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
-import 'dart:typed_data';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 class MockHttpOverrides extends HttpOverrides {
   @override
@@ -73,4 +74,40 @@ class MockHttpClientResponse implements HttpClientResponse {
 class MockHttpHeaders implements HttpHeaders {
   @override
   void noSuchMethod(Invocation invocation) {}
+}
+
+void setupSecureStorageMock() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  final Map<String, String> data = {};
+  
+  Future<dynamic> handler(MethodCall methodCall) async {
+    switch (methodCall.method) {
+      case 'read':
+        return data[methodCall.arguments['key']];
+      case 'write':
+        data[methodCall.arguments['key']] = methodCall.arguments['value'];
+        return null;
+      case 'delete':
+        data.remove(methodCall.arguments['key']);
+        return null;
+      case 'deleteAll':
+        data.clear();
+        return null;
+      case 'readAll':
+        return data;
+      default:
+        return null;
+    }
+  }
+
+  const channels = [
+    'plugins.it_solutions.com.br/flutter_secure_storage',
+    'plugins.it_nomads.com/flutter_secure_storage',
+    'flutter_secure_storage',
+  ];
+  
+  for (final channelName in channels) {
+    final channel = MethodChannel(channelName);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, handler);
+  }
 }

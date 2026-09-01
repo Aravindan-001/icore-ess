@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/custom_text_field.dart';
+import '../../core/utils/dependency_injection.dart';
+import '../../models/leave.dart';
 
 class ApplyLeaveScreen extends StatefulWidget {
   const ApplyLeaveScreen({super.key});
@@ -39,17 +41,36 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
     }
   }
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isSubmitting = true);
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) {
+      try {
+        final request = LeaveRequest(
+          id: 'LR${DateTime.now().millisecondsSinceEpoch}',
+          type: _selectedLeaveType,
+          startDate: _startDate,
+          endDate: _endDate,
+          reason: _reasonController.text,
+          status: LeaveStatus.pending,
+          appliedDate: DateTime.now(),
+        );
+
+        final success = await DependencyInjection.repository.applyLeave(request);
+        if (success && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Leave application submitted successfully')),
+            const SnackBar(content: Text('Leave application submitted successfully'), backgroundColor: AppTheme.success),
           );
           Navigator.pop(context);
         }
-      });
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.error),
+          );
+        }
+      } finally {
+        if (mounted) setState(() => _isSubmitting = false);
+      }
     }
   }
 

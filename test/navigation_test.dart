@@ -6,6 +6,7 @@ import 'test_utils.dart';
 
 void main() {
   HttpOverrides.global = MockHttpOverrides();
+  setupSecureStorageMock();
 
   testWidgets('Bottom Navigation flow test', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1080, 2400);

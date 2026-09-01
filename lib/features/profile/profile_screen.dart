@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/dependency_injection.dart';
+import '../../core/utils/session_manager.dart';
 import '../../models/employee.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +57,14 @@ class ProfileScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: OutlinedButton(
-                    onPressed: () => Navigator.pushReplacementNamed(context, AppConstants.loginRoute),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                      SessionManager.clearSession();
+                      Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
+                        AppConstants.loginRoute, 
+                        (route) => false,
+                      );
+                    },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppTheme.error,
                       side: const BorderSide(color: AppTheme.error),

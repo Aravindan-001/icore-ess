@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import '../../repositories/ess_repository.dart';
 import '../../repositories/mock_ess_repository.dart';
 import '../../repositories/soap_ess_repository.dart';
@@ -6,23 +7,27 @@ import '../../services/soap/soap_client.dart';
 import '../../services/soap/soap_config.dart';
 
 class DependencyInjection {
-  static final EssRepository _mockRepository = MockEssRepository();
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   
-  static EssRepository _repository = _mockRepository;
-  static LocationService _locationService = GeolocatorLocationService();
+  static EssRepository? _repository;
+  static LocationService? _locationService;
 
-  static EssRepository get repository => _repository;
-  static LocationService get locationService => _locationService;
+  static EssRepository get repository {
+    _repository ??= MockEssRepository();
+    return _repository!;
+  }
 
-  /// Switches the app to use the SOAP backend. 
-  /// Requires implementation of SoapEssRepository.
+  static LocationService get locationService {
+    _locationService ??= GeolocatorLocationService();
+    return _locationService!;
+  }
+
   static void useSoapBackend(AppEnvironment env) {
     _repository = SoapEssRepository(SoapClient(
       env == AppEnvironment.uat ? SoapConfig.uat() : SoapConfig.prod(),
     ));
   }
 
-  // Method to override dependencies for testing
   static void setDependencies({
     EssRepository? repository,
     LocationService? locationService,

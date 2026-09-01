@@ -6,6 +6,7 @@ import 'test_utils.dart';
 
 void main() {
   HttpOverrides.global = MockHttpOverrides();
+  setupSecureStorageMock();
 
   testWidgets('Leave management and application flow', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1080, 2400);

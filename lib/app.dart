@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
+import 'core/utils/dependency_injection.dart';
 import 'features/auth/login_screen.dart';
 import 'features/attendance/attendance_screen.dart';
 import 'features/claims/claims_screen.dart';
@@ -22,6 +23,7 @@ class ICoreEssApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: DependencyInjection.navigatorKey,
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
