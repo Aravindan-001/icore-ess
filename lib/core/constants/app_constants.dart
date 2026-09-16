@@ -17,6 +17,7 @@ class AppConstants {
   static const String preOrderRoute = '/pre-order';
   static const String salesOrderRoute = '/sales-order';
   static const String notificationsRoute = '/notifications';
+  static const String requestsRoute = '/requests';
   static const String settingsRoute = '/settings';
   static const String attendanceRoute = '/attendance';
 

@@ -9,6 +9,7 @@ import 'features/claims/claims_screen.dart';
 import 'features/leave/apply_leave_screen.dart';
 import 'features/leave/leave_screen.dart';
 import 'features/notifications/notifications_screen.dart';
+import 'features/requests/requests_screen.dart';
 import 'features/pay_summary/pay_summary_screen.dart';
 import 'features/payslip/payslip_screen.dart';
 import 'features/pre_order/pre_order_screen.dart';
@@ -43,6 +44,7 @@ class ICoreEssApp extends StatelessWidget {
         AppConstants.preOrderRoute: (context) => const PreOrderScreen(),
         AppConstants.salesOrderRoute: (context) => const SalesOrderScreen(),
         AppConstants.notificationsRoute: (context) => const NotificationsScreen(),
+        AppConstants.requestsRoute: (context) => const RequestsScreen(),
         AppConstants.settingsRoute: (context) => const SettingsScreen(),
         AppConstants.attendanceRoute: (context) => const AttendanceScreen(),
       },
