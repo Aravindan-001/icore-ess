@@ -25,8 +25,6 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
@@ -46,8 +44,8 @@ class _MainNavigationState extends State<MainNavigation> {
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.explore_outlined),
-            selectedIcon: Icon(Icons.explore),
+            icon: Icon(Icons.grid_view_outlined),
+            selectedIcon: Icon(Icons.grid_view),
             label: 'Explore',
           ),
           NavigationDestination(
