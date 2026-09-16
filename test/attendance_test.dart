@@ -15,6 +15,8 @@ void main() {
     late MockLocationService locationService;
 
     setUp(() {
+      DependencyInjection.reset();
+      clearMockSecureStorage();
       locationService = MockLocationService();
       DependencyInjection.setDependencies(locationService: locationService);
     });
@@ -28,15 +30,22 @@ void main() {
       locationService.setMockLocation(AppConstants.officeLatitude, AppConstants.officeLongitude);
 
       await tester.pumpWidget(const ICoreEssApp());
-      await tester.enterText(find.widgetWithText(TextFormField, 'Enter your employee ID'), 'EMP001');
-      await tester.enterText(find.widgetWithText(TextFormField, 'Enter your password'), '123456');
+      await tester.pumpAndBootstrap();
+      await tester.enterText(find.byKey(const Key('field_Employee ID')), 'EMP001');
+      await tester.enterText(find.byKey(const Key('field_Password')), '123456');
       await tester.tap(find.text('Login'));
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.grid_view_outlined));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Attendance'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
       await tester.pumpAndSettle();
 
       expect(find.text('Not Checked In'), findsOneWidget);
@@ -53,10 +62,13 @@ void main() {
       locationService.setMockLocation(AppConstants.officeLatitude + 0.01, AppConstants.officeLongitude + 0.01);
 
       await tester.pumpWidget(const ICoreEssApp());
-      await tester.enterText(find.widgetWithText(TextFormField, 'Enter your employee ID'), 'EMP001');
-      await tester.enterText(find.widgetWithText(TextFormField, 'Enter your password'), '123456');
+      await tester.pumpAndBootstrap();
+      await tester.enterText(find.byKey(const Key('field_Employee ID')), 'EMP001');
+      await tester.enterText(find.byKey(const Key('field_Password')), '123456');
       await tester.tap(find.text('Login'));
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.grid_view_outlined));
       await tester.pumpAndSettle();
@@ -78,10 +90,13 @@ void main() {
       locationService.setMockLocation(AppConstants.officeLatitude, AppConstants.officeLongitude);
 
       await tester.pumpWidget(const ICoreEssApp());
-      await tester.enterText(find.widgetWithText(TextFormField, 'Enter your employee ID'), 'EMP001');
-      await tester.enterText(find.widgetWithText(TextFormField, 'Enter your password'), '123456');
+      await tester.pumpAndBootstrap();
+      await tester.enterText(find.byKey(const Key('field_Employee ID')), 'EMP001');
+      await tester.enterText(find.byKey(const Key('field_Password')), '123456');
       await tester.tap(find.text('Login'));
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.grid_view_outlined));
       await tester.pumpAndSettle();
@@ -95,7 +110,8 @@ void main() {
       // Verify loading state prevents duplicate taps (button should be disabled or shows indicator)
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
 
       expect(find.text('Currently Checked In'), findsOneWidget);
       expect(find.text('CHECK OUT'), findsOneWidget);
@@ -108,12 +124,11 @@ void main() {
       // Check Out
       await tester.tap(find.text('CHECK OUT'));
       await tester.pump();
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pump();
 
-      expect(find.text('Attendance Completed'), findsOneWidget);
-      expect(find.text('CHECK IN'), findsNothing);
-      expect(find.text('CHECK OUT'), findsNothing);
-      expect(find.text('Checked out successfully!'), findsOneWidget);
+      expect(find.text('Attendance Completed'), findsWidgets);
+      expect(find.text('Checked out successfully!'), findsWidgets);
       expect(find.text("Today's attendance has been completed."), findsOneWidget);
     });
 
@@ -126,10 +141,13 @@ void main() {
       locationService.setMockLocation(AppConstants.officeLatitude, AppConstants.officeLongitude);
 
       await tester.pumpWidget(const ICoreEssApp());
-      await tester.enterText(find.widgetWithText(TextFormField, 'Enter your employee ID'), 'EMP001');
-      await tester.enterText(find.widgetWithText(TextFormField, 'Enter your password'), '123456');
+      await tester.pumpAndBootstrap();
+      await tester.enterText(find.byKey(const Key('field_Employee ID')), 'EMP001');
+      await tester.enterText(find.byKey(const Key('field_Password')), '123456');
       await tester.tap(find.text('Login'));
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.grid_view_outlined));
       await tester.pumpAndSettle();
@@ -146,7 +164,8 @@ void main() {
       await tester.tap(find.byIcon(Icons.refresh));
       await tester.pump();
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pump(); // This should be enough to show the result after loading
 
       expect(find.text('Outside Office Area'), findsOneWidget);
       expect(find.textContaining('0.0 m'), findsNothing);

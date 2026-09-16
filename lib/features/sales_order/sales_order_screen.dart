@@ -12,7 +12,7 @@ class SalesOrderScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Sales Orders')),
       body: FutureBuilder<List<SalesOrder>>(
-        future: DependencyInjection.repository.getSalesOrders(),
+        future: DependencyInjection.orderService.getSalesOrders(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import '../utils/startup_utils.dart';
+import '../utils/startup_trace.dart';
 
 class AppTheme {
-  // Corporate Colors
-  static const Color primaryBlue = Color(0xFF1A237E); // Deep Navy
-  static const Color accentBlue = Color(0xFF3F51B5);
-  static const Color backgroundLight = Color(0xFFF5F7FA);
-  static const Color white = Colors.white;
-  static const Color textDark = Color(0xFF212121);
-  static const Color textGrey = Color(0xFF757575);
-  static const Color success = Color(0xFF4CAF50);
-  static const Color error = Color(0xFFE57373);
-  static const Color warning = Color(0xFFFFB74D);
+  // Modern Enterprise Colors
+  static const Color primaryBlue = Color(0xFF1E40AF); // Professional Blue
+  static const Color accentBlue = Color(0xFF3B82F6);
+  static const Color backgroundLight = Color(0xFFFFFFFF);
+  static const Color surfaceContainer = Color(0xFFF8FAFC);
+  static const Color textMain = Color(0xFF0F172A);
+  static const Color textMuted = Color(0xFF64748B);
+  static const Color textGrey = Color(0xFF64748B); // Compatibility
+  static const Color outline = Color(0xFFE2E8F0);
+  static const Color error = Color(0xFFEF4444);
+  static const Color success = Color(0xFF10B981);
+  static const Color warning = Color(0xFFF59E0B); // Compatibility
 
   static ThemeData? _lightTheme;
 
@@ -25,55 +27,74 @@ class AppTheme {
         seedColor: primaryBlue,
         primary: primaryBlue,
         secondary: accentBlue,
-        surface: white,
+        surface: backgroundLight,
+        onSurface: textMain,
         error: error,
+        outline: textMuted,
+        surfaceContainerLow: surfaceContainer,
       ),
       scaffoldBackgroundColor: backgroundLight,
       textTheme: _buildTextTheme(),
       appBarTheme: const AppBarTheme(
-        backgroundColor: primaryBlue,
-        foregroundColor: white,
+        backgroundColor: backgroundLight,
+        foregroundColor: textMain,
         elevation: 0,
-        centerTitle: false,
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          color: textMain,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       cardTheme: CardThemeData(
-        color: white,
-        elevation: 2,
+        color: backgroundLight,
+        elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: outline),
         ),
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryBlue,
-          foregroundColor: white,
-          minimumSize: const Size(double.infinity, 52),
+          foregroundColor: Colors.white,
+          minimumSize: const Size(double.infinity, 56),
+          elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(16),
           ),
           textStyle: const TextStyle(
             fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: primaryBlue,
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: white,
+        fillColor: surfaceContainer,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: outline),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: primaryBlue, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       ),
     );
     debugPrint('[STARTUP] AppTheme lightTheme initialized: ${startupStopwatch.elapsedMilliseconds}ms');
@@ -81,14 +102,13 @@ class AppTheme {
   }
 
   static TextTheme _buildTextTheme() {
-    debugPrint('[STARTUP] AppTheme building textTheme: ${startupStopwatch.elapsedMilliseconds}ms');
     return const TextTheme(
-      displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: textDark),
-      displayMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: textDark),
-      titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: textDark),
-      bodyLarge: TextStyle(fontSize: 16, color: textDark),
-      bodyMedium: TextStyle(fontSize: 14, color: textDark),
-      labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: textGrey),
+      displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.w800, color: textMain, letterSpacing: -0.5),
+      headlineMedium: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: textMain, letterSpacing: -0.5),
+      titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: textMain),
+      bodyLarge: TextStyle(fontSize: 16, color: textMain, height: 1.5),
+      bodyMedium: TextStyle(fontSize: 14, color: textMain),
+      labelLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textMuted),
     );
   }
 }

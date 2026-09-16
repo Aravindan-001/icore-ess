@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "817816690065",
+    "project_id": "icore-ess-production",
+    "storage_bucket": "icore-ess-production.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:817816690065:android:83039ef1472979d776ce30",
+        "android_client_info": {
+          "package_name": "com.example.icore_ess"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsp_lUVpVbR0XjE7gab396bjkJOp6GFMw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

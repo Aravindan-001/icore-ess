@@ -16,7 +16,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _employeeIdController = TextEditingController();
+  final _loginIdController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = false;
@@ -34,8 +34,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final savedId = await SessionManager.getRememberedId();
       if (mounted && savedId != null) {
         setState(() {
+          _loginIdController.text = savedId;
           _rememberMe = true;
-          _employeeIdController.text = savedId;
         });
       }
     }
@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _employeeIdController.dispose();
+    _loginIdController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -53,45 +53,38 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _isLoading = true);
       
       try {
-        final success = await DependencyInjection.repository.login(
-          _employeeIdController.text,
+        final result = await DependencyInjection.authService.login(
+          _loginIdController.text,
           _passwordController.text,
+          rememberMe: _rememberMe,
         );
 
         if (mounted) {
           setState(() => _isLoading = false);
-          if (success) {
-            if (_rememberMe) {
-              await SessionManager.setRememberMe(true);
-              await SessionManager.saveRememberedId(_employeeIdController.text);
-            } else {
-              await SessionManager.setRememberMe(false);
-              await SessionManager.clearRememberedId();
-            }
-            if (mounted) {
-              Navigator.pushReplacementNamed(context, AppConstants.mainRoute);
-            }
+          if (result.isSuccess) {
+            Navigator.pushReplacementNamed(context, AppConstants.mainRoute);
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Invalid Employee ID or password.'),
-                backgroundColor: AppTheme.error,
-              ),
-            );
+            _showError(result.message ?? 'Invalid Employee ID or password.');
           }
         }
       } catch (e) {
         if (mounted) {
           setState(() => _isLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Login error: $e'),
-              backgroundColor: AppTheme.error,
-            ),
-          );
+          _showError('Connection error. Please try again.');
         }
       }
     }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppTheme.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 
   @override
@@ -101,57 +94,71 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.symmetric(horizontal: AppConstants.spacing2Xl),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppConstants.spacing4Xl),
+                  
+                  // Logo
                   Image.asset(
                     'assets/images/ebaconnect_logo.png',
                     height: 120,
                   ),
-                  const SizedBox(height: 16),
+                  
+                  const SizedBox(height: AppConstants.spacingMd),
+                  
                   Text(
                     'ebaConnect',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
                           color: AppTheme.primaryBlue,
                         ),
                   ),
-                  const SizedBox(height: 32),
+                  
+                  const SizedBox(height: AppConstants.spacing4Xl),
+                  
                   Text(
                     'Welcome Back',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: AppTheme.textDark,
+                          color: AppTheme.textMain,
                         ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppConstants.spacingSm),
                   Text(
                     'Sign in to your account',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           color: AppTheme.textGrey,
                         ),
                   ),
-                  const SizedBox(height: 40),
+                  
+                  const SizedBox(height: AppConstants.spacing4Xl),
+                  
+                  // Employee ID Field
                   CustomTextField(
-                    controller: _employeeIdController,
+                    textFieldKey: const Key('field_Employee ID'),
+                    controller: _loginIdController,
                     label: 'Employee ID',
                     hint: 'Enter your employee ID',
                     keyboardType: TextInputType.text,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your Employee ID';
+                        return 'Employee ID is required';
                       }
                       return null;
                     },
                   ),
-                  const SizedBox(height: 20),
+                  
+                  const SizedBox(height: AppConstants.spacing2Xl),
+                  
+                  // Password Field
                   CustomTextField(
+                    textFieldKey: const Key('field_Password'),
                     controller: _passwordController,
                     label: 'Password',
                     hint: 'Enter your password',
@@ -161,20 +168,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         _obscurePassword ? Icons.visibility_off : Icons.visibility,
                         color: AppTheme.textGrey,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
+                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
+                        return 'Password is required';
                       }
                       return null;
                     },
                   ),
-                  const SizedBox(height: 12),
+                  
+                  const SizedBox(height: AppConstants.spacingMd),
+                  
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -193,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppConstants.spacingSm),
                           Text(
                             'Remember Me',
                             style: Theme.of(context).textTheme.bodyMedium,
@@ -213,13 +218,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 40),
+                  
+                  const SizedBox(height: AppConstants.spacing4Xl),
+                  
+                  // Login Button
                   ElevatedButton(
                     onPressed: _isLoading ? null : _handleLogin,
                     child: _isLoading
                         ? const SizedBox(
-                            height: 20,
-                            width: 20,
+                            height: 24,
+                            width: 24,
                             child: CircularProgressIndicator(
                               color: Colors.white,
                               strokeWidth: 2,
@@ -227,7 +235,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           )
                         : const Text('Login'),
                   ),
-                  const SizedBox(height: 24),
+                  
+                  const SizedBox(height: AppConstants.spacing4Xl),
                 ],
               ),
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
 import 'core/utils/dependency_injection.dart';
+import 'features/auth/bootstrap_screen.dart';
 import 'features/auth/login_screen.dart';
 import 'features/attendance/attendance_screen.dart';
 import 'features/claims/claims_screen.dart';
@@ -27,8 +28,9 @@ class ICoreEssApp extends StatelessWidget {
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      initialRoute: AppConstants.loginRoute,
+      initialRoute: AppConstants.bootstrapRoute,
       routes: {
+        AppConstants.bootstrapRoute: (context) => const BootstrapScreen(),
         AppConstants.loginRoute: (context) => const LoginScreen(),
         AppConstants.mainRoute: (context) => const MainNavigation(),
         AppConstants.profileRoute: (context) => const ProfileScreen(),

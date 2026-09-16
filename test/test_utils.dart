@@ -76,25 +76,26 @@ class MockHttpHeaders implements HttpHeaders {
   void noSuchMethod(Invocation invocation) {}
 }
 
+final Map<String, String> _mockStorageData = {};
+
 void setupSecureStorageMock() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  final Map<String, String> data = {};
   
   Future<dynamic> handler(MethodCall methodCall) async {
     switch (methodCall.method) {
       case 'read':
-        return data[methodCall.arguments['key']];
+        return _mockStorageData[methodCall.arguments['key']];
       case 'write':
-        data[methodCall.arguments['key']] = methodCall.arguments['value'];
+        _mockStorageData[methodCall.arguments['key']] = methodCall.arguments['value'];
         return null;
       case 'delete':
-        data.remove(methodCall.arguments['key']);
+        _mockStorageData.remove(methodCall.arguments['key']);
         return null;
       case 'deleteAll':
-        data.clear();
+        _mockStorageData.clear();
         return null;
       case 'readAll':
-        return data;
+        return Map.from(_mockStorageData);
       default:
         return null;
     }
@@ -109,5 +110,19 @@ void setupSecureStorageMock() {
   for (final channelName in channels) {
     final channel = MethodChannel(channelName);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, handler);
+  }
+}
+
+void clearMockSecureStorage() {
+  _mockStorageData.clear();
+}
+
+extension BootstrapTester on WidgetTester {
+  Future<void> pumpAndBootstrap() async {
+    await pump(); 
+    // Give time for the bootstrap logic and potential initial screen loading (like Dashboard)
+    await pump(const Duration(seconds: 1));
+    await pump(const Duration(seconds: 1));
+    await pumpAndSettle();
   }
 }

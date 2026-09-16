@@ -3,18 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:icore_ess/app.dart';
+import 'package:icore_ess/core/utils/dependency_injection.dart';
 import 'test_utils.dart';
 
 void main() {
   HttpOverrides.global = MockHttpOverrides();
   setupSecureStorageMock();
 
+  setUp(() {
+    DependencyInjection.reset();
+    clearMockSecureStorage();
+  });
+
   Future<void> login(WidgetTester tester) async {
     await tester.pumpWidget(const ICoreEssApp());
-    await tester.enterText(find.widgetWithText(TextFormField, 'Enter your employee ID'), 'EMP001');
-    await tester.enterText(find.widgetWithText(TextFormField, 'Enter your password'), '123456');
+    await tester.pumpAndBootstrap();
+    await tester.enterText(find.byKey(const Key('field_Employee ID')), 'EMP001');
+    await tester.enterText(find.byKey(const Key('field_Password')), '123456');
     await tester.tap(find.text('Login'));
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
   }
 
   group('Claims and Reimbursement Functional Tests', () {
@@ -29,7 +38,9 @@ void main() {
       await tester.tap(find.byIcon(Icons.grid_view_outlined));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Claims'));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump();
 
       // Initial count
       final initialItems = find.byType(Card).evaluate().length;
@@ -65,29 +76,29 @@ void main() {
       await tester.tap(find.byIcon(Icons.grid_view_outlined));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Reimburse'));
-      await tester.pumpAndSettle();
-
-      // Initial count
-      final initialItems = find.byType(Card).evaluate().length;
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump();
 
       // Submit new reimbursement
-      await tester.tap(find.byType(FloatingActionButton));
+      await tester.tap(find.text('Add Row'));
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextFormField).at(0), 'Travel');
-      await tester.enterText(find.byType(TextFormField).at(1), 'New Travel Expense');
-      await tester.enterText(find.byType(TextFormField).at(2), '500');
-      await tester.tap(find.text('Submit Request'));
+      await tester.enterText(find.widgetWithText(TextFormField, 'Description'), 'New Travel Expense');
+      await tester.enterText(find.widgetWithText(TextFormField, 'Amount'), '500');
+      await tester.enterText(find.widgetWithText(TextFormField, 'Claim Amount'), '500');
+      
+      // Tap the "Add Row" button inside the dialog
+      await tester.tap(find.descendant(of: find.byType(Dialog), matching: find.text('Add Row')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Submit'));
       await tester.pump();
       await tester.pumpAndSettle();
 
-      expect(find.text('Reimbursement request submitted'), findsOneWidget);
-      expect(find.text('New Travel Expense'), findsOneWidget);
-      expect(find.text('Travel • ${DateFormat('dd MMM yyyy').format(DateTime.now())}'), findsOneWidget);
-      expect(find.text('₹500'), findsOneWidget);
-      
-      final finalItems = find.byType(Card).evaluate().length;
-      expect(finalItems, initialItems + 1);
+      expect(find.text('Reimbursement submitted successfully'), findsOneWidget);
+      expect(find.textContaining('New Travel Expense'), findsOneWidget);
+      expect(find.textContaining('500.0'), findsWidgets);
     });
   });
 }

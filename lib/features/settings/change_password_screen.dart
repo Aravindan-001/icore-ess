@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/widgets/custom_text_field.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/utils/dependency_injection.dart';
+import '../../core/widgets/custom_text_field.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -22,8 +22,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       setState(() => _isLoading = true);
       
       try {
-        final employee = await DependencyInjection.repository.getEmployeeProfile();
-        final success = await DependencyInjection.repository.changePassword(
+        final employee = await DependencyInjection.profileService.getEmployeeProfile();
+        final success = await DependencyInjection.authService.changePassword(
           employee.id,
           _currentPasswordController.text,
           _newPasswordController.text,
@@ -33,12 +33,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           setState(() => _isLoading = false);
           if (success) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Password changed successfully'), backgroundColor: AppTheme.success),
+              const SnackBar(content: Text('Password changed successfully')),
             );
             Navigator.pop(context);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Failed to change password. Please check your current password.'), backgroundColor: AppTheme.error),
+              const SnackBar(
+                content: Text('Failed to change password. Please check your current password.'),
+                backgroundColor: Colors.red,
+              ),
             );
           }
         }
@@ -46,7 +49,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         if (mounted) {
           setState(() => _isLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.error),
+            SnackBar(
+              content: Text('Error: $e'),
+              backgroundColor: Colors.red,
+            ),
           );
         }
       }
@@ -55,10 +61,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Change Password')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(AppConstants.spacing2Xl),
         child: Form(
           key: _formKey,
           child: Column(
@@ -69,7 +77,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 isPassword: true,
                 validator: (value) => value == null || value.isEmpty ? 'Please enter current password' : null,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppConstants.spacingLg),
               CustomTextField(
                 controller: _newPasswordController,
                 label: 'New Password',
@@ -81,7 +89,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppConstants.spacingLg),
               CustomTextField(
                 controller: _confirmPasswordController,
                 label: 'Confirm New Password',
@@ -91,11 +99,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppConstants.spacing3Xl),
               ElevatedButton(
                 onPressed: _isLoading ? null : _handleSubmit,
                 child: _isLoading
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: colorScheme.onPrimary,
+                          strokeWidth: 2,
+                        ),
+                      )
                     : const Text('Change Password'),
               ),
             ],

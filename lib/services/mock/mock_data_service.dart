@@ -15,8 +15,9 @@ class MockDataService {
   );
 
   static final List<LeaveBalance> mockLeaveBalances = [
-    LeaveBalance(type: 'Annual Leave', total: 20, used: 5, pending: 1),
-    LeaveBalance(type: 'Sick Leave', total: 10, used: 2, pending: 0),
+    LeaveBalance(type: 'Annual Leave', total: 25, used: 0, pending: 13),
+    LeaveBalance(type: 'Roster Leave', total: 24, used: 0, pending: 0),
+    LeaveBalance(type: 'Sick Leave', total: 45, used: 0, pending: 0),
     LeaveBalance(type: 'Casual Leave', total: 5, used: 1, pending: 0),
   ];
 

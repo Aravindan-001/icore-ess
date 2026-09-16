@@ -14,13 +14,18 @@ void main() {
     addTearDown(() => tester.view.resetPhysicalSize());
 
     await tester.pumpWidget(const ICoreEssApp());
-    await tester.enterText(find.widgetWithText(TextFormField, 'Enter your employee ID'), 'EMP001');
-    await tester.enterText(find.widgetWithText(TextFormField, 'Enter your password'), '123456');
+    await tester.pumpAndBootstrap();
+    await tester.enterText(find.byKey(const Key('field_Employee ID')), 'EMP001');
+    await tester.enterText(find.byKey(const Key('field_Password')), '123456');
     await tester.tap(find.text('Login'));
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('Orders'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
     expect(find.text('Company Store'), findsOneWidget);
     
     await tester.pageBack();
@@ -30,7 +35,9 @@ void main() {
     await tester.pumpAndSettle();
     
     await tester.tap(find.text('Sales Order'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
     expect(find.text('Sales Orders'), findsOneWidget);
   });
 }

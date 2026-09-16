@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/widgets/custom_text_field.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/utils/dependency_injection.dart';
+import '../../core/widgets/custom_text_field.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -20,7 +20,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       setState(() => _isLoading = true);
       
       try {
-        final success = await DependencyInjection.repository.forgotPassword(_idController.text);
+        final success = await DependencyInjection.authService.forgotPassword(_idController.text);
         
         if (mounted) {
           setState(() => _isLoading = false);
@@ -45,7 +45,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Invalid Employee ID or Email.'),
-                backgroundColor: AppTheme.error,
+                backgroundColor: Colors.red,
               ),
             );
           }
@@ -54,7 +54,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         if (mounted) {
           setState(() => _isLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.error),
+            SnackBar(
+              content: Text('Error: $e'),
+              backgroundColor: Colors.red,
+            ),
           );
         }
       }
@@ -63,26 +66,28 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Scaffold(
       appBar: AppBar(title: const Text('Forgot Password')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(AppConstants.spacing2Xl),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: AppConstants.spacingXl),
               Text(
                 'Reset Your Password',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppConstants.spacingMd),
               Text(
                 'Enter your Employee ID or registered Email address and we will send you instructions to reset your password.',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.textGrey),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppConstants.spacing3Xl),
               CustomTextField(
                 controller: _idController,
                 label: 'Employee ID / Email',
@@ -91,24 +96,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your ID or Email';
                   }
-                  // Basic validation for Employee ID (e.g., EMPxxx) or Email
-                  final isEmail = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value);
-                  final isEmpId = RegExp(r'^EMP\d+$').hasMatch(value);
-                  
-                  if (!isEmail && !isEmpId && value != 'EMP001') { // Allow EMP001 for mock
-                     // In a real app, validation might be stricter.
-                  }
                   return null;
                 },
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: AppConstants.spacing4Xl),
               ElevatedButton(
                 onPressed: _isLoading ? null : _handleSubmit,
                 child: _isLoading
-                    ? const SizedBox(
+                    ? SizedBox(
                         height: 20,
                         width: 20,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        child: CircularProgressIndicator(color: colorScheme.onPrimary, strokeWidth: 2),
                       )
                     : const Text('Submit Request'),
               ),

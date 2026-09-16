@@ -27,6 +27,8 @@ void main() {
     late ErrorLocationService errorLocationService;
 
     setUp(() {
+      DependencyInjection.reset();
+      clearMockSecureStorage();
       errorLocationService = ErrorLocationService();
       DependencyInjection.setDependencies(locationService: errorLocationService);
     });
@@ -37,10 +39,13 @@ void main() {
       addTearDown(() => tester.view.resetPhysicalSize());
 
       await tester.pumpWidget(const ICoreEssApp());
-      await tester.enterText(find.widgetWithText(TextFormField, 'Enter your employee ID'), 'EMP001');
-      await tester.enterText(find.widgetWithText(TextFormField, 'Enter your password'), '123456');
+      await tester.pumpAndBootstrap();
+      await tester.enterText(find.byKey(const Key('field_Employee ID')), 'EMP001');
+      await tester.enterText(find.byKey(const Key('field_Password')), '123456');
       await tester.tap(find.text('Login'));
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.grid_view_outlined));
       await tester.pumpAndSettle();
     }

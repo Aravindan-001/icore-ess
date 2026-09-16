@@ -50,6 +50,9 @@ class LocationResult {
 abstract class LocationService {
   Future<LocationResult> getLocationDetails();
   
+  /// Opens the device location settings or app settings.
+  Future<void> openLocationSettings();
+  
   // Keep these for backward compatibility if needed, but prefer getLocationDetails
   Future<double> getDistanceFromOffice();
   Future<bool> isWithinGeofence();
@@ -103,6 +106,11 @@ class MockLocationService with LocationCalculator implements LocationService {
     final details = await getLocationDetails();
     return details.isWithinGeofence;
   }
+
+  @override
+  Future<void> openLocationSettings() async {
+    // No-op for mock
+  }
 }
 
 class GeolocatorLocationService with LocationCalculator implements LocationService {
@@ -154,7 +162,8 @@ class GeolocatorLocationService with LocationCalculator implements LocationServi
         longitude: position.longitude,
         accuracy: position.accuracy,
         distanceFromOffice: distance,
-        isWithinGeofence: distance <= AppConstants.allowedRadiusInMeters,
+        isWithinGeofence: distance <= AppConstants.allowedRadiusInMeters && 
+                         position.accuracy <= AppConstants.maxAllowedAccuracyInMeters,
         isMocked: position.isMocked,
       );
     } catch (e) {
@@ -172,5 +181,10 @@ class GeolocatorLocationService with LocationCalculator implements LocationServi
   Future<bool> isWithinGeofence() async {
     final details = await getLocationDetails();
     return details.isWithinGeofence;
+  }
+
+  @override
+  Future<void> openLocationSettings() async {
+    await Geolocator.openAppSettings();
   }
 }

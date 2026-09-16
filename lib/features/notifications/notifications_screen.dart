@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../core/theme/app_theme.dart';
 import '../../core/utils/dependency_injection.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../models/notification.dart';
@@ -10,10 +9,12 @@ class NotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Scaffold(
       appBar: AppBar(title: const Text('Notifications')),
       body: FutureBuilder<List<AppNotification>>(
-        future: DependencyInjection.repository.getNotifications(),
+        future: DependencyInjection.notificationService.getNotifications(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -40,10 +41,10 @@ class NotificationsScreen extends StatelessWidget {
               
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: !isRead ? AppTheme.primaryBlue.withValues(alpha: 0.1) : Colors.transparent,
+                  backgroundColor: !isRead ? colorScheme.primary.withValues(alpha: 0.1) : Colors.transparent,
                   child: Icon(
                     !isRead ? Icons.notifications_active : Icons.notifications_none,
-                    color: !isRead ? AppTheme.primaryBlue : AppTheme.textGrey,
+                    color: !isRead ? colorScheme.primary : colorScheme.outline,
                   ),
                 ),
                 title: Text(
@@ -53,7 +54,7 @@ class NotificationsScreen extends StatelessWidget {
                 subtitle: Text(item.message),
                 trailing: Text(
                   _formatTimestamp(item.timestamp), 
-                  style: const TextStyle(fontSize: 10, color: AppTheme.textGrey)
+                  style: TextStyle(fontSize: 10, color: colorScheme.outline)
                 ),
                 onTap: () {},
               );
@@ -63,6 +64,7 @@ class NotificationsScreen extends StatelessWidget {
       ),
     );
   }
+
 
   String _formatTimestamp(DateTime timestamp) {
     final now = DateTime.now();

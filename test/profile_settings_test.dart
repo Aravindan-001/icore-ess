@@ -14,21 +14,27 @@ void main() {
     addTearDown(() => tester.view.resetPhysicalSize());
 
     await tester.pumpWidget(const ICoreEssApp());
-    await tester.pumpAndSettle();
+    await tester.pumpAndBootstrap();
     await tester.enterText(find.byKey(const Key('field_Employee ID')), 'EMP001');
     await tester.enterText(find.byKey(const Key('field_Password')), '123456');
     await tester.tap(find.text('Login'));
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.person_outline));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
     await tester.tap(find.byIcon(Icons.settings));
     await tester.pumpAndSettle();
 
     final logoutButton = find.text('Logout');
     await tester.ensureVisible(logoutButton);
     await tester.tap(logoutButton);
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
     
     expect(find.byKey(const Key('field_Employee ID')), findsOneWidget);
   });

@@ -15,19 +15,24 @@ void main() {
     addTearDown(() => tester.view.resetPhysicalSize());
 
     await tester.pumpWidget(const ICoreEssApp());
-    await tester.enterText(find.widgetWithText(TextFormField, 'Enter your employee ID'), 'EMP001');
-    await tester.enterText(find.widgetWithText(TextFormField, 'Enter your password'), '123456');
+    await tester.pumpAndBootstrap();
+    await tester.enterText(find.byKey(const Key('field_Employee ID')), 'EMP001');
+    await tester.enterText(find.byKey(const Key('field_Password')), '123456');
     await tester.tap(find.text('Login'));
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
 
-    expect(find.text('Aravind Kumar'), findsOneWidget);
+    expect(find.textContaining('Aravind Kumar'), findsOneWidget);
     expect(find.text('Leave Summary'), findsOneWidget);
     expect(find.byType(ServiceCard), findsAtLeastNWidgets(6));
 
     final leaveCard = find.text('Leave').last;
     await tester.ensureVisible(leaveCard);
     await tester.tap(leaveCard);
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
     expect(find.text('Leave Management'), findsOneWidget);
   });
 }

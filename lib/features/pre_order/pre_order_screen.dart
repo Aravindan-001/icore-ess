@@ -25,7 +25,7 @@ class _PreOrderScreenState extends State<PreOrderScreen> {
   Future<void> _fetchProducts() async {
     setState(() => _isLoading = true);
     try {
-      final products = await DependencyInjection.repository.getProducts();
+      final products = await DependencyInjection.orderService.getProducts();
       if (mounted) {
         setState(() {
           _products = products;
@@ -68,7 +68,7 @@ class _PreOrderScreenState extends State<PreOrderScreen> {
   Future<void> _handlePlaceOrder() async {
     setState(() => _isSubmitting = true);
     try {
-      final success = await DependencyInjection.repository.placeOrder(_cart);
+      final success = await DependencyInjection.orderService.placeOrder(_cart);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Order placed successfully'), backgroundColor: AppTheme.success),

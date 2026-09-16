@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/utils/dependency_injection.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../models/payslip.dart';
@@ -12,7 +12,7 @@ class PayslipScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Payslips')),
       body: FutureBuilder<List<Payslip>>(
-        future: DependencyInjection.repository.getPayslips(),
+        future: DependencyInjection.payrollService.getPayslips(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -29,7 +29,7 @@ class PayslipScreen extends StatelessWidget {
             );
           }
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppConstants.spacingLg),
             itemCount: payslips.length,
             itemBuilder: (context, index) {
               final payslip = payslips[index];
@@ -39,15 +39,15 @@ class PayslipScreen extends StatelessWidget {
                   subtitle: Text('Net Salary: ₹${payslip.netSalary.toStringAsFixed(0)}'),
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(AppConstants.spacingLg),
                       child: Column(
                         children: [
-                          _buildSalaryRow('Basic Salary', payslip.basicSalary),
-                          _buildSalaryRow('Allowances', payslip.allowances),
-                          _buildSalaryRow('Deductions', -payslip.deductions, isNegative: true),
+                          _buildSalaryRow(context, 'Basic Salary', payslip.basicSalary),
+                          _buildSalaryRow(context, 'Allowances', payslip.allowances),
+                          _buildSalaryRow(context, 'Deductions', -payslip.deductions, isNegative: true),
                           const Divider(),
-                          _buildSalaryRow('Net Salary', payslip.netSalary, isTotal: true),
-                          const SizedBox(height: 16),
+                          _buildSalaryRow(context, 'Net Salary', payslip.netSalary, isTotal: true),
+                          const SizedBox(height: AppConstants.spacingLg),
                           OutlinedButton.icon(
                             onPressed: () {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -73,7 +73,9 @@ class PayslipScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSalaryRow(String label, double amount, {bool isNegative = false, bool isTotal = false}) {
+  Widget _buildSalaryRow(BuildContext context, String label, double amount, {bool isNegative = false, bool isTotal = false}) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -85,7 +87,7 @@ class PayslipScreen extends StatelessWidget {
             style: TextStyle(
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
               fontSize: isTotal ? 16 : 14,
-              color: isNegative ? AppTheme.error : (isTotal ? AppTheme.primaryBlue : AppTheme.textDark),
+              color: isNegative ? colorScheme.error : (isTotal ? colorScheme.primary : colorScheme.onSurface),
             ),
           ),
         ],

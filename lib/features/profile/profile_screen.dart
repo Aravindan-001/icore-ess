@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_constants.dart';
-import '../../core/theme/app_theme.dart';
 import '../../core/utils/dependency_injection.dart';
-import '../../core/utils/session_manager.dart';
 import '../../models/employee.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -15,6 +13,8 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Profile'),
@@ -26,7 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: FutureBuilder<Employee>(
-        future: DependencyInjection.repository.getEmployeeProfile(),
+        future: DependencyInjection.profileService.getEmployeeProfile(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -38,42 +38,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
           return SingleChildScrollView(
             child: Column(
               children: [
-                const SizedBox(height: 24),
+                const SizedBox(height: AppConstants.spacing2Xl),
                 CircleAvatar(
                   radius: 60,
+                  backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
                   backgroundImage: employee.profileImageUrl.isNotEmpty ? NetworkImage(employee.profileImageUrl) : null,
-                  child: employee.profileImageUrl.isEmpty ? const Icon(Icons.person, size: 60) : null,
+                  child: employee.profileImageUrl.isEmpty ? Icon(Icons.person, size: 60, color: colorScheme.primary) : null,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppConstants.spacingLg),
                 Text(employee.name, style: Theme.of(context).textTheme.displaySmall),
-                Text(employee.designation, style: Theme.of(context).textTheme.titleMedium?.copyWith(color: AppTheme.textGrey)),
-                const SizedBox(height: 32),
+                Text(
+                  employee.designation, 
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(color: colorScheme.outline)
+                ),
+                const SizedBox(height: AppConstants.spacing3Xl),
                 _buildProfileInfo(context, 'Employee ID', employee.id, Icons.badge),
                 _buildProfileInfo(context, 'Department', employee.department, Icons.business),
                 _buildProfileInfo(context, 'Email', employee.email, Icons.email),
                 _buildProfileInfo(context, 'Phone', employee.phone, Icons.phone),
                 _buildProfileInfo(context, 'Joining Date', employee.joiningDate, Icons.calendar_today),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppConstants.spacing3Xl),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: AppConstants.spacingXl),
                   child: OutlinedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                      SessionManager.clearSession();
-                      Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
-                        AppConstants.loginRoute, 
-                        (route) => false,
-                      );
-                    },
+                    onPressed: () => DependencyInjection.authService.logout(context),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppTheme.error,
-                      side: const BorderSide(color: AppTheme.error),
+                      foregroundColor: colorScheme.error,
+                      side: BorderSide(color: colorScheme.error),
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     child: const Text('Logout'),
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: AppConstants.spacing4Xl),
               ],
             ),
           );
@@ -83,12 +80,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildProfileInfo(BuildContext context, String label, String value, IconData icon) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppConstants.spacingXl, vertical: AppConstants.spacingSm),
       child: Row(
         children: [
-          Icon(icon, color: AppTheme.primaryBlue, size: 20),
-          const SizedBox(width: 16),
+          Icon(icon, color: colorScheme.primary, size: 20),
+          const SizedBox(width: AppConstants.spacingLg),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -100,4 +99,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
 }

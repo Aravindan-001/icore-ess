@@ -1,63 +1,55 @@
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
 
 class ServiceCard extends StatelessWidget {
   final String title;
   final IconData icon;
   final VoidCallback onTap;
-  final Color? iconColor;
+  final Color? color;
+  final Color? backgroundColor;
 
   const ServiceCard({
     super.key,
     required this.title,
     required this.icon,
     required this.onTap,
-    this.iconColor,
+    this.color,
+    this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final themeColor = color ?? Theme.of(context).colorScheme.primary;
+    final bgColor = backgroundColor ?? Colors.white;
+    
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
-          color: AppTheme.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFEEEEEE)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          color: bgColor,
+          borderRadius: BorderRadius.circular(16),
+          border: backgroundColor == null 
+              ? Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5), width: 1)
+              : null,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: (iconColor ?? AppTheme.primaryBlue).withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                color: iconColor ?? AppTheme.primaryBlue,
-                size: 24,
-              ),
+            Icon(
+              icon,
+              color: themeColor,
+              size: 28,
             ),
             const SizedBox(height: 8),
             Text(
               title,
               textAlign: TextAlign.center,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
             ),
           ],
@@ -66,3 +58,4 @@ class ServiceCard extends StatelessWidget {
     );
   }
 }
+

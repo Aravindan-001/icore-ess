@@ -7,14 +7,15 @@ void main() {
   group('MockEssRepository Tests', () {
     final repository = MockEssRepository();
 
-    test('login with correct credentials returns true', () async {
+    test('login with correct credentials returns success', () async {
       final result = await repository.login('EMP001', '123456');
-      expect(result, true);
+      expect(result.isSuccess, true);
+      expect(result.employee?.name, 'Aravind Kumar');
     });
 
-    test('login with incorrect credentials returns false', () async {
+    test('login with incorrect credentials returns failure', () async {
       final result = await repository.login('WRONG', 'wrong');
-      expect(result, false);
+      expect(result.isSuccess, false);
     });
 
     test('getEmployeeProfile returns mock data', () async {

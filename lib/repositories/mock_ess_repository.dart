@@ -8,6 +8,7 @@ import '../models/pay_summary.dart';
 import '../models/notification.dart';
 import '../models/product.dart';
 import '../models/sales_order.dart';
+import '../models/auth_result.dart';
 import '../services/mock/mock_data_service.dart';
 import 'ess_repository.dart';
 
@@ -71,23 +72,31 @@ class MockEssRepository implements EssRepository {
   ];
 
   @override
-  Future<bool> login(String employeeId, String password) async {
-    // DEVELOPMENT MOCK ONLY: Real authentication will use SOAP/XML services.
-    // Integration point for Session Security: Store returned AuthToken/SessionID in flutter_secure_storage.
-    await Future.delayed(const Duration(seconds: 1));
-    return employeeId == 'EMP001' && password == _mockPassword;
+  Future<AuthResult> login(String employeeId, String password) async {
+    await Future.delayed(const Duration(milliseconds: 10));
+    if (employeeId == 'EMP001' && password == _mockPassword) {
+      return AuthResult.success(
+        token: 'mock_token_123',
+        employee: MockDataService.mockEmployee,
+      );
+    }
+    return AuthResult.failure(AuthStatus.invalidCredentials, 'Invalid Employee ID or password.');
+  }
+
+  @override
+  Future<void> logout() async {
+    await Future.delayed(const Duration(milliseconds: 10));
   }
 
   @override
   Future<bool> forgotPassword(String employeeIdOrEmail) async {
-    await Future.delayed(const Duration(seconds: 1));
-    // Simulate finding employee
+    await Future.delayed(const Duration(milliseconds: 10));
     return employeeIdOrEmail == 'EMP001' || employeeIdOrEmail == 'aravind.kumar@ebaconnect.com';
   }
 
   @override
   Future<bool> changePassword(String employeeId, String currentPassword, String newPassword) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 10));
     if (employeeId == 'EMP001' && currentPassword == _mockPassword) {
       _mockPassword = newPassword;
       return true;
@@ -156,31 +165,31 @@ class MockEssRepository implements EssRepository {
 
   @override
   Future<Employee> getEmployeeProfile() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 10));
     return MockDataService.mockEmployee;
   }
 
   @override
   Future<List<LeaveBalance>> getLeaveBalances() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 10));
     return MockDataService.mockLeaveBalances;
   }
 
   @override
   Future<List<LeaveRequest>> getLeaveRequests() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 10));
     return MockDataService.mockLeaveRequests;
   }
 
   @override
   Future<List<Payslip>> getPayslips() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 10));
     return MockDataService.mockPayslips;
   }
 
   @override
   Future<PaySummary> getPaySummary() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 10));
     return PaySummary(
       annualGrossPay: 780000,
       totalDeductionsYtd: 60000,
@@ -197,7 +206,7 @@ class MockEssRepository implements EssRepository {
 
   @override
   Future<List<AppNotification>> getNotifications() async {
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 10));
     return [
       AppNotification(
         id: '1',
@@ -237,7 +246,7 @@ class MockEssRepository implements EssRepository {
 
   @override
   Future<List<Product>> getProducts() async {
-    await Future.delayed(const Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 10));
     return [
       Product(id: 'P1', name: 'Company Hoodie', price: 1200),
       Product(id: 'P2', name: 'Water Bottle', price: 450),
@@ -248,7 +257,7 @@ class MockEssRepository implements EssRepository {
 
   @override
   Future<List<SalesOrder>> getSalesOrders() async {
-    await Future.delayed(const Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 10));
     return [
       SalesOrder(orderNumber: 'SO-005', date: DateTime(2024, 5, 15), amount: 4500, status: 'Delivered'),
       SalesOrder(orderNumber: 'SO-004', date: DateTime(2024, 5, 10), amount: 1200, status: 'Processing'),
@@ -260,25 +269,25 @@ class MockEssRepository implements EssRepository {
 
   @override
   Future<bool> placeOrder(Map<String, int> cart) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 10));
     return true;
   }
 
   @override
   Future<bool> applyLeave(LeaveRequest request) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 10));
     return true;
   }
 
   @override
   Future<AttendanceRecord> getTodayAttendance() async {
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 10));
     return _todayAttendance;
   }
 
   @override
   Future<bool> checkIn(AttendanceRequest request) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 10));
     if (_todayAttendance.status != AttendanceStatus.notMarked) return false;
     
     _todayAttendance = _todayAttendance.copyWith(
@@ -290,7 +299,7 @@ class MockEssRepository implements EssRepository {
 
   @override
   Future<bool> checkOut(AttendanceRequest request) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 10));
     if (_todayAttendance.status != AttendanceStatus.checkedIn) return false;
     
     _todayAttendance = _todayAttendance.copyWith(
@@ -302,26 +311,26 @@ class MockEssRepository implements EssRepository {
 
   @override
   Future<List<MedicalClaim>> getMedicalClaims() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 10));
     return List.from(_claims);
   }
 
   @override
   Future<bool> submitMedicalClaim(MedicalClaim claim) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 10));
     _claims.insert(0, claim);
     return true;
   }
 
   @override
   Future<List<Reimbursement>> getReimbursements() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 10));
     return List.from(_reimbursements);
   }
 
   @override
   Future<bool> submitReimbursement(Reimbursement reimbursement) async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 10));
     _reimbursements.insert(0, reimbursement);
     return true;
   }

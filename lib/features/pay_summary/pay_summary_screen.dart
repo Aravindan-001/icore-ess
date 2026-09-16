@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/utils/dependency_injection.dart';
 import '../../models/pay_summary.dart';
 
@@ -8,10 +8,12 @@ class PaySummaryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Scaffold(
       appBar: AppBar(title: const Text('Pay Summary')),
       body: FutureBuilder<PaySummary>(
-        future: DependencyInjection.repository.getPaySummary(),
+        future: DependencyInjection.payrollService.getPaySummary(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -23,7 +25,7 @@ class PaySummaryScreen extends StatelessWidget {
           final summary = snapshot.data!;
           
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppConstants.spacingXl),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -33,31 +35,31 @@ class PaySummaryScreen extends StatelessWidget {
                   '₹${summary.annualGrossPay.toStringAsFixed(0)}', 
                   Icons.account_balance_wallet
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppConstants.spacingLg),
                 _buildSummaryCard(
                   context, 
                   'Total Deductions (YTD)', 
                   '₹${summary.totalDeductionsYtd.toStringAsFixed(0)}', 
                   Icons.money_off, 
-                  color: AppTheme.error
+                  color: colorScheme.error
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppConstants.spacingLg),
                 _buildSummaryCard(
                   context, 
                   'Net Pay (YTD)', 
                   '₹${summary.netPayYtd.toStringAsFixed(0)}', 
                   Icons.payments, 
-                  color: AppTheme.success
+                  color: Colors.green
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppConstants.spacing2Xl),
                 Text('Monthly Breakdown', style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppConstants.spacingLg),
                 ...summary.monthlyBreakdown.map((item) {
                   return Card(
                     child: ListTile(
-                      leading: const CircleAvatar(
-                        backgroundColor: AppTheme.backgroundLight, 
-                        child: Icon(Icons.calendar_month, color: AppTheme.primaryBlue)
+                      leading: CircleAvatar(
+                        backgroundColor: colorScheme.surfaceContainerHighest, 
+                        child: Icon(Icons.calendar_month, color: colorScheme.primary)
                       ),
                       title: Text(item.month),
                       trailing: Text(
@@ -76,21 +78,33 @@ class PaySummaryScreen extends StatelessWidget {
   }
 
   Widget _buildSummaryCard(BuildContext context, String title, String amount, IconData icon, {Color? color}) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppConstants.spacingXl),
       decoration: BoxDecoration(
-        color: AppTheme.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: (color ?? AppTheme.primaryBlue).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-            child: Icon(icon, color: color ?? AppTheme.primaryBlue),
+            padding: const EdgeInsets.all(AppConstants.spacingMd),
+            decoration: BoxDecoration(
+              color: (color ?? colorScheme.primary).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color ?? colorScheme.primary),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppConstants.spacingLg),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +114,7 @@ class PaySummaryScreen extends StatelessWidget {
                   amount, 
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold, 
-                    color: color ?? AppTheme.primaryBlue
+                    color: color ?? colorScheme.primary
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),

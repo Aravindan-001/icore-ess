@@ -27,7 +27,7 @@ class _ClaimsScreenState extends State<ClaimsScreen> {
   Future<void> _fetchClaims() async {
     setState(() => _isLoading = true);
     try {
-      final claims = await DependencyInjection.repository.getMedicalClaims();
+      final claims = await DependencyInjection.expenseService.getMedicalClaims();
       if (mounted) {
         setState(() {
           _claims = claims;
@@ -99,18 +99,11 @@ class _ClaimsScreenState extends State<ClaimsScreen> {
                     setModalState(() => isSubmitting = true);
                     
                     try {
-                      final employee = await DependencyInjection.repository.getEmployeeProfile();
-                      final claim = MedicalClaim(
-                        id: 'CLM${DateTime.now().millisecondsSinceEpoch}',
-                        employeeId: employee.id,
+                      final success = await DependencyInjection.expenseService.submitMedicalClaim(
                         type: typeController.text,
                         description: _descController.text,
                         amount: double.tryParse(_amountController.text) ?? 0.0,
-                        date: DateTime.now(),
-                        status: 'Pending',
                       );
-
-                      final success = await DependencyInjection.repository.submitMedicalClaim(claim);
                       if (success && mounted) {
                         if (context.mounted) Navigator.pop(context);
                         _fetchClaims();

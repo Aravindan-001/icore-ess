@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_constants.dart';
+import 'package:flutter/foundation.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/utils/session_manager.dart';
+import '../../core/utils/dependency_injection.dart';
 import 'change_password_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -59,18 +60,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: const Text('Version 1.0.0'),
             onTap: () {},
           ),
+          if (kDebugMode) ...[
+            const _SettingsSection(title: 'Developer Tools'),
+            ListTile(
+              title: const Text('Trigger Test Crash'),
+              subtitle: const Text('Verification for Firebase Crashlytics'),
+              trailing: const Icon(Icons.bug_report, color: Colors.orange),
+              onTap: () {
+                debugPrint('Firebase Crashlytics: Triggering manual test crash...');
+                FirebaseCrashlytics.instance.crash();
+              },
+            ),
+          ],
           const SizedBox(height: 24),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: TextButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                SessionManager.clearSession();
-                Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
-                  AppConstants.loginRoute, 
-                  (route) => false,
-                );
-              },
+              onPressed: () => DependencyInjection.authService.logout(context),
               child: const Text('Logout', style: TextStyle(color: AppTheme.error)),
             ),
           ),

@@ -8,6 +8,7 @@ import '../models/pay_summary.dart';
 import '../models/notification.dart';
 import '../models/product.dart';
 import '../models/sales_order.dart';
+import '../models/auth_result.dart';
 import '../services/soap/soap_client.dart';
 import 'ess_repository.dart';
 
@@ -20,9 +21,14 @@ class SoapEssRepository implements EssRepository {
   SoapEssRepository(this.client);
 
   @override
-  Future<bool> login(String employeeId, String password) async {
+  Future<AuthResult> login(String employeeId, String password) async {
     // TODO: Map to SOAP 'Login' or 'Authenticate' operation
     throw UnimplementedError('Backend Integration Pending: Login SOAP contract required');
+  }
+
+  @override
+  Future<void> logout() async {
+    throw UnimplementedError('Backend Integration Pending: Logout SOAP contract required');
   }
 
   @override
