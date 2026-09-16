@@ -1,12 +1,30 @@
 # ebaConnect
 
-Employee Self-Service (ESS) mobile application built with Flutter.
+**Employee Self-Service (ESS) Mobile Application**
+
+ebaConnect is a Flutter-based Employee Self-Service mobile application designed to provide employees with a centralized platform for accessing HR, attendance, payroll, leave, reimbursement, and workplace services.
+
+The current release focuses on a functional frontend prototype with mock data, real device GPS integration, attendance business rules, secure session handling, and a layered architecture prepared for SOAP/XML backend integration.
+
+---
 
 ## Overview
 
-ebaConnect is a mobile Employee Self-Service application designed to provide employees with a centralized platform for accessing HR and workplace services.
+The application provides a mobile-first ESS experience with:
 
-The application currently provides a complete frontend implementation with mock data, functional ESS workflows, GPS-based attendance, and a repository-based architecture prepared for SOAP/XML backend integration.
+* Employee authentication
+* Dashboard and employee information
+* GPS-based attendance
+* Leave management
+* Payroll and payslip access
+* Reimbursement and claims workflows
+* Sales and pre-order modules
+* Notifications
+* Profile and account settings
+
+The application currently operates with mock repositories. Production integration will be completed after receiving the client's SOAP/WSDL contract and backend specifications.
+
+---
 
 ## Features
 
@@ -15,11 +33,14 @@ The application currently provides a complete frontend implementation with mock 
 * Employee ID and password login
 * Form validation
 * Password visibility toggle
-* Remember Me persistence
+* Remember Me functionality
 * Forgot Password flow
-* Loading states
+* Loading and error states
 * Mock authentication
-* Secure session management
+* Secure session lifecycle management
+* Logout and session cleanup
+
+> Passwords are not stored as part of Remember Me functionality.
 
 ### Dashboard
 
@@ -27,20 +48,35 @@ The application currently provides a complete frontend implementation with mock 
 * Employee information
 * Attendance summary
 * ESS service shortcuts
+* Payroll summary presentation
+* Navigation to major ESS modules
 
 ### Attendance
 
-* Check-In / Check-Out
+* Check-In and Check-Out workflow
 * Real device GPS location
-* 50-meter office geofence
-* GPS accuracy handling
+* Configurable 50-meter office geofence
+* GPS accuracy validation
 * Location permission handling
-* Sequential attendance validation
+* Location service abstraction
+* Sequential attendance state validation
 * Daily attendance session control
 
-**Attendance Flow**
+#### Attendance State Flow
 
-`Not Marked → Check In → Checked In → Check Out → Completed`
+```text
+Not Marked
+    ↓
+Check In
+    ↓
+Checked In
+    ↓
+Check Out
+    ↓
+Completed
+```
+
+The current client-side implementation validates the attendance flow and geofence rules locally. Final attendance authorization and persistence are planned to be enforced by the production backend.
 
 ### ESS Modules
 
@@ -58,68 +94,140 @@ The application currently provides a complete frontend implementation with mock 
 * Change Password
 * Logout
 
-## Location & Geofencing
+---
 
-The Attendance module uses device GPS to determine whether an employee is within the configured office radius.
+## Location and Geofencing
+
+The Attendance module uses the device's GPS location to calculate the employee's distance from the configured office coordinates.
 
 ```text
 Device GPS
     ↓
 Location Service
     ↓
+GPS Accuracy Validation
+    ↓
 Distance Calculation
     ↓
 50m Geofence Check
     ↓
+Attendance State Validation
+    ↓
 Check-In / Check-Out
 ```
 
-The location layer is abstracted so it can be extended or replaced without affecting the Attendance UI.
+The location functionality is abstracted behind a service interface so that the implementation can be changed or extended without coupling GPS-specific logic to the Attendance UI.
+
+### Important Production Consideration
+
+Client-side geofencing improves user feedback, but it should not be treated as the final security boundary. The production backend should independently validate:
+
+* Employee identity
+* Attendance state
+* Request timestamp
+* Latitude and longitude
+* GPS accuracy, where supported
+* Office geofence distance
+* Duplicate or invalid attendance requests
+
+---
 
 ## Architecture
 
-The application follows a layered repository-based architecture:
+ebaConnect follows a layered architecture that separates presentation, application logic, business rules, and data access.
 
 ```text
 Flutter UI
     ↓
-Feature Modules
+Feature Screens and Widgets
     ↓
-Repository Layer
+Application Services
     ↓
-Service / Data Layer
+Repository Contracts
+    ↓
+Mock Repository / SOAP Repository
     ↓
 Mock Data / SOAP XML Backend
 ```
 
-The repository abstraction allows `MockEssRepository` to be replaced with the production SOAP/XML implementation during backend integration.
+### Architectural Responsibilities
+
+| Layer            | Responsibility                                                            |
+| ---------------- | ------------------------------------------------------------------------- |
+| UI Layer         | Screens, widgets, user interaction, and presentation                      |
+| Service Layer    | Application workflows, orchestration, and business rules                  |
+| Repository Layer | Data-access contracts and backend abstraction                             |
+| Mock Repository  | Local development and testing data                                        |
+| SOAP Repository  | Planned production XML communication                                      |
+| Core Layer       | Shared constants, errors, utilities, session handling, and infrastructure |
+
+### Repository Contracts
+
+The application uses feature-oriented repository contracts rather than depending on one large repository interface.
+
+Current repository areas include:
+
+* Authentication
+* Attendance
+* Leave
+* Payroll
+* Profile
+* Expenses
+* Orders
+* Notifications
+
+This design allows the mock data implementation to be replaced progressively with production SOAP/XML services.
+
+---
 
 ## Technology Stack
+
+### Frontend
 
 * Flutter
 * Dart
 * Material 3
+* Responsive mobile UI
+* Android platform integration
+
+### Device and Security
+
 * Geolocator
-* flutter_secure_storage
-* Android GPS & Location Services
+* Android GPS and Location Services
+* `flutter_secure_storage`
+* Runtime permission handling
+* Session lifecycle management
+
+### Architecture and Engineering
+
+* Layered architecture
 * Repository Pattern
-* Mock Data Repository
-* SOAP/XML — planned backend integration
+* Application Service Layer
+* Dependency Injection
+* Domain-specific validation and exceptions
+* Mock data repositories
+* Automated regression testing
+
+### Backend Integration
+
+* SOAP/XML — planned
+* WSDL-based service integration — pending client contract
+
+---
 
 ## Quality Assurance
 
-The application has been validated through automated functional, regression, and business-rule tests.
+The application has been validated through automated tests, static analysis, build verification, and runtime checks.
 
-| Metric               |             Result |
-| -------------------- | -----------------: |
-| Automated Tests      |                 34 |
-| Passed               |                 34 |
-| Failed               |                  0 |
-| Flutter Analyze      |          No issues |
-| Release APK          | Successfully built |
-| Runtime Verification |             Passed |
+| Validation           | Result |
+| -------------------- | -----: |
+| Automated test cases |     41 |
+| Test failures        |      0 |
+| Flutter Analyze      | Passed |
+| Release APK build    | Passed |
+| Runtime verification | Passed |
 
-Test coverage includes:
+### Tested Areas
 
 * Authentication
 * Login validation
@@ -127,78 +235,175 @@ Test coverage includes:
 * Forgot Password
 * Dashboard
 * Navigation
-* Attendance
-* GPS & Geofencing
+* Attendance workflow
+* GPS and geofencing rules
+* Attendance state transitions
 * Leave Management
-* Payslip
+* Payslips
 * Pay Summary
 * Reimbursement
 * Claims
 * Pre Orders
 * Sales Orders
 * Notifications
-* Profile
+* Employee Profile
 * Settings
 * Logout
 * Repository functionality
-* Security & business rules
+* Security rules
+* Business-rule validation
+
+### Verification Commands
+
+```bash
+flutter analyze
+flutter test
+flutter build apk --release
+```
+
+---
 
 ## Demo Credentials
+
+The current frontend prototype includes demo authentication credentials:
 
 ```text
 Employee ID: EMP001
 Password: 123456
 ```
 
-> These credentials are intended only for the current frontend/demo environment.
+> These credentials are intended only for the current mock/demo environment. They must not be used for production authentication.
 
-## Security
+---
+
+## Security Considerations
+
+The current implementation includes:
 
 * Passwords are not stored for Remember Me functionality.
 * Employee ID and Remember Me state are persisted using secure storage.
-* Logout clears active session-related data while preserving remembered Employee ID when applicable.
-* Repository abstraction separates UI from backend authentication implementation.
+* Active session-related data is cleared during logout.
+* Remembered Employee ID can be preserved according to the user's Remember Me preference.
+* UI components are separated from repository and backend implementation details.
+* Attendance business rules are centralized in the application service layer.
+
+### Production Security Requirements
+
+Before production deployment, the backend integration should additionally define and enforce:
+
+* Secure authentication and token/session handling
+* Transport security
+* SOAP fault handling
+* Server-side authorization
+* Server-side attendance validation
+* Request replay protection
+* Audit logging
+* Credential and secret management
+* Production environment configuration
+
+---
 
 ## Backend Integration
 
-The current application uses `MockEssRepository` for frontend development and testing.
+The current application uses `MockEssRepository` and related mock repository implementations for frontend development and testing.
 
-### Planned Production Architecture
+### Current Data Flow
 
 ```text
 Flutter Application
         ↓
-Repository Layer
+Application Services
         ↓
-SOAP/XML Request
+Repository Contracts
         ↓
-Backend / HR System
+Mock Repository
         ↓
-Employee & Attendance Data
+Mock Data
 ```
 
-### Production Attendance Flow
+### Planned Production Data Flow
 
 ```text
-Real GPS
-    ↓
-Client-side Geofence Check
-    ↓
-SOAP/XML Request
-    ↓
-Server-side 50m Validation
-    ↓
-Attendance Recorded
+Flutter Application
+        ↓
+Application Services
+        ↓
+Repository Contracts
+        ↓
+SOAP/XML Repository
+        ↓
+SOAP Request
+        ↓
+Client HR / Backend System
+        ↓
+SOAP XML Response
+        ↓
+Application Models
+        ↓
+Flutter UI
 ```
 
-Server-side validation should remain the final authority for attendance verification.
+### Planned Production Attendance Flow
+
+```text
+Real Device GPS
+        ↓
+Client-Side Geofence Check
+        ↓
+Attendance Service
+        ↓
+SOAP/XML Request
+        ↓
+Server-Side Identity and Geofence Validation
+        ↓
+Attendance Persistence
+        ↓
+SOAP/XML Response
+        ↓
+Updated Attendance State
+```
+
+The backend should remain the final authority for attendance verification and persistence.
+
+### SOAP Integration Prerequisites
+
+Production integration requires the following information from the client:
+
+* WSDL file or SOAP service documentation
+* Service endpoint URLs
+* SOAP namespaces
+* Authentication mechanism
+* SOAP action names
+* Request and response XML schemas
+* Employee authentication contract
+* Attendance request and response contract
+* Employee profile contract
+* Leave and payroll contracts
+* SOAP fault/error format
+* Network and VPN requirements
+* Production and testing environment details
+
+---
 
 ## Project Structure
 
 ```text
 lib/
 ├── core/
+│   ├── constants/
+│   ├── errors/
+│   ├── session/
+│   └── utilities/
 ├── features/
+│   ├── attendance/
+│   ├── authentication/
+│   ├── dashboard/
+│   ├── expenses/
+│   ├── leave/
+│   ├── notifications/
+│   ├── orders/
+│   ├── payroll/
+│   └── profile/
 ├── models/
 ├── navigation/
 ├── repositories/
@@ -221,7 +426,25 @@ test/
 └── widget_test.dart
 ```
 
-## Running the Project
+---
+
+## Getting Started
+
+### Prerequisites
+
+Install the following before running the project:
+
+* Flutter SDK
+* Dart SDK included with Flutter
+* Android Studio
+* Android SDK
+* Android emulator or physical Android device
+
+Verify the Flutter installation:
+
+```bash
+flutter doctor
+```
 
 ### Install Dependencies
 
@@ -229,19 +452,19 @@ test/
 flutter pub get
 ```
 
-### Static Analysis
+### Run Static Analysis
 
 ```bash
 flutter analyze
 ```
 
-### Run Tests
+### Run Automated Tests
 
 ```bash
 flutter test
 ```
 
-### Run on Android Emulator / Device
+### Run the Application
 
 ```bash
 flutter run
@@ -259,38 +482,67 @@ flutter build apk --debug
 flutter build apk --release
 ```
 
-## Current Status
+---
 
-### Phase 1 — Frontend & Functional Prototype
+## Development Status
 
-* [x] UI implementation
-* [x] Production login screen
+### Phase 1 — Frontend and Functional Prototype
+
+* [x] Flutter UI implementation
+* [x] Production-style login screen
 * [x] Mock authentication
 * [x] Remember Me persistence
 * [x] Secure session management
-* [x] ESS modules
+* [x] ESS module navigation
 * [x] Attendance workflow
 * [x] Real GPS integration
-* [x] 50m geofencing
-* [x] Navigation flows
-* [x] Automated QA
+* [x] Client-side 50-meter geofencing
+* [x] Attendance state validation
+* [x] Location permission handling
+* [x] Application service layer
+* [x] Repository contracts
+* [x] Mock repositories
+* [x] Automated testing
 * [x] Regression testing
-* [x] Security/business-rule testing
+* [x] Security and business-rule testing
+* [x] Static analysis
 * [x] Release APK build verification
 
 ### Phase 2 — SOAP/XML Backend Integration
 
-**Status: Backend Integration Ready — Awaiting Client SOAP/WSDL Contract**
+**Status: Ready for SOAP/WSDL Integration**
 
-Planned work:
+* [ ] Receive client SOAP/WSDL contract
+* [ ] Configure service endpoints
+* [ ] Implement SOAP/XML transport
+* [ ] Implement production authentication
+* [ ] Map SOAP responses to application models
+* [ ] Integrate real employee data
+* [ ] Integrate real attendance persistence
+* [ ] Implement server-side attendance validation
+* [ ] Integrate leave and payroll services
+* [ ] Implement production SOAP fault handling
+* [ ] Add integration and end-to-end tests
+* [ ] Validate production security requirements
 
-* [ ] SOAP service integration
-* [ ] Real employee authentication
-* [ ] Server-side attendance validation
-* [ ] Real attendance persistence
-* [ ] Live HR/ESS data synchronization
-* [ ] Production API error handling
+---
+
+## Current Limitations
+
+The current release is a frontend prototype and has the following limitations:
+
+* ESS data is currently mock data.
+* Authentication is not connected to the production HR system.
+* SOAP/XML integration is pending the client contract.
+* Attendance is not yet persisted to the production backend.
+* Server-side geofence validation is not yet implemented.
+* Some advanced form fields and attachment workflows require final backend contract mapping.
+* Production deployment configuration is not yet finalized.
+
+---
 
 ## License
 
 This project is currently developed for client/project use.
+
+All rights reserved unless otherwise specified by the project owner or client agreement.
