@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../core/utils/dependency_injection.dart';
+import '../../core/providers/injection_providers.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../models/sales_order.dart';
 
-class SalesOrderScreen extends StatelessWidget {
+class SalesOrderScreen extends ConsumerWidget {
   const SalesOrderScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(title: const Text('Sales Orders')),
       body: FutureBuilder<List<SalesOrder>>(
-        future: DependencyInjection.orderService.getSalesOrders(),
+        future: ref.read(orderServiceProvider).getSalesOrders(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

@@ -59,7 +59,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryBlue,
           foregroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, 56),
+          minimumSize: const Size(64, 48),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
@@ -95,6 +95,22 @@ class AppTheme {
           borderSide: const BorderSide(color: primaryBlue, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: Colors.white,
+        indicatorColor: primaryBlue.withValues(alpha: 0.1),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: primaryBlue, size: 26);
+          }
+          return const IconThemeData(color: textMuted, size: 24);
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 12);
+          }
+          return const TextStyle(color: textMuted, fontWeight: FontWeight.w500, fontSize: 12);
+        }),
       ),
     );
     debugPrint('[STARTUP] AppTheme lightTheme initialized: ${startupStopwatch.elapsedMilliseconds}ms');

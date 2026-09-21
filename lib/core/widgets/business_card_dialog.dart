@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/employee.dart';
-import '../utils/dependency_injection.dart';
 import '../theme/app_theme.dart';
 
-class BusinessCardDialog extends StatelessWidget {
+class BusinessCardDialog extends ConsumerWidget {
   final Employee employee;
 
   const BusinessCardDialog({super.key, required this.employee});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -40,7 +40,7 @@ class BusinessCardDialog extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    employee.name.toLowerCase(), // Replicating lower case name from screenshot if needed, but normally title case is better. The screenshot shows 'hrmanager'
+                    employee.name.toLowerCase(), 
                     style: textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.onSurface,
@@ -93,9 +93,9 @@ class BusinessCardDialog extends StatelessWidget {
             Align(
               alignment: Alignment.bottomRight,
               child: TextButton(
-                onPressed: () => DependencyInjection.authService.logout(context),
+                onPressed: () => Navigator.pop(context),
                 child: Text(
-                  'Logout',
+                  'Close',
                   style: TextStyle(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,

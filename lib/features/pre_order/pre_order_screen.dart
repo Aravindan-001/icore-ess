@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/utils/dependency_injection.dart';
+import '../../core/providers/injection_providers.dart';
 import '../../models/product.dart';
 
-class PreOrderScreen extends StatefulWidget {
+class PreOrderScreen extends ConsumerStatefulWidget {
   const PreOrderScreen({super.key});
 
   @override
-  State<PreOrderScreen> createState() => _PreOrderScreenState();
+  ConsumerState<PreOrderScreen> createState() => _PreOrderScreenState();
 }
 
-class _PreOrderScreenState extends State<PreOrderScreen> {
+class _PreOrderScreenState extends ConsumerState<PreOrderScreen> {
   List<Product>? _products;
   final Map<String, int> _cart = {};
   bool _isLoading = true;
@@ -25,7 +26,8 @@ class _PreOrderScreenState extends State<PreOrderScreen> {
   Future<void> _fetchProducts() async {
     setState(() => _isLoading = true);
     try {
-      final products = await DependencyInjection.orderService.getProducts();
+      final orderService = ref.read(orderServiceProvider);
+      final products = await orderService.getProducts();
       if (mounted) {
         setState(() {
           _products = products;
@@ -68,7 +70,8 @@ class _PreOrderScreenState extends State<PreOrderScreen> {
   Future<void> _handlePlaceOrder() async {
     setState(() => _isSubmitting = true);
     try {
-      final success = await DependencyInjection.orderService.placeOrder(_cart);
+      final orderService = ref.read(orderServiceProvider);
+      final success = await orderService.placeOrder(_cart);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Order placed successfully'), backgroundColor: AppTheme.success),

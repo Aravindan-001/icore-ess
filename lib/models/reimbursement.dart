@@ -17,6 +17,30 @@ class Reimbursement {
     required this.status,
   });
 
+  factory Reimbursement.fromJson(Map<String, dynamic> json) {
+    return Reimbursement(
+      id: json['id'] ?? '',
+      employeeId: json['employeeId'] ?? '',
+      category: json['category'] ?? '',
+      description: json['description'] ?? '',
+      amount: (json['amount'] ?? 0).toDouble(),
+      date: DateTime.parse(json['date']),
+      status: json['status'] ?? 'Pending',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'employeeId': employeeId,
+      'category': category,
+      'description': description,
+      'amount': amount,
+      'date': date.toIso8601String(),
+      'status': status,
+    };
+  }
+
   Reimbursement copyWith({
     String? status,
   }) {

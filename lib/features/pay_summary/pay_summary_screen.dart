@@ -1,127 +1,318 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_constants.dart';
-import '../../core/utils/dependency_injection.dart';
-import '../../models/pay_summary.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/theme/app_theme.dart';
 
-class PaySummaryScreen extends StatelessWidget {
+class PaySummaryScreen extends ConsumerStatefulWidget {
   const PaySummaryScreen({super.key});
 
   @override
+  ConsumerState<PaySummaryScreen> createState() => _PaySummaryScreenState();
+}
+
+class _PaySummaryScreenState extends ConsumerState<PaySummaryScreen> {
+  String _selectedYear = '2025';
+  String _selectedMonth = 'January';
+
+  final List<String> _years = ['2025', '2024', '2023'];
+  final List<String> _months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  // Mock data for the payroll components mapping
+  Map<String, double> _getMonthlyComponents(String month) {
+    // Proportional mock data from references
+    return {
+      'Basic Salary': 52750.00,
+      'Housing Allowance': 37000.00,
+      'Transportation Allowance': 33500.00,
+      'Other Allowance': 31750.00,
+      'Pension Fund - Employee': 6330.00,
+      'Total': 148670.00,
+    };
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
+    final components = _getMonthlyComponents(_selectedMonth);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Pay Summary')),
-      body: FutureBuilder<PaySummary>(
-        future: DependencyInjection.payrollService.getPaySummary(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return const Center(child: Text('Error loading pay summary'));
-          }
-          
-          final summary = snapshot.data!;
-          
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(AppConstants.spacingXl),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        title: const Text(
+          'Pay Summary',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: AppTheme.primaryBlue,
+        foregroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+      ),
+      body: Column(
+        children: [
+          // Year Selection Card
+          Container(
+            padding: const EdgeInsets.all(16),
+            color: Colors.white,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildSummaryCard(
-                  context, 
-                  'Annual Gross Pay', 
-                  '₹${summary.annualGrossPay.toStringAsFixed(0)}', 
-                  Icons.account_balance_wallet
+                const Text(
+                  'Payroll Year',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: AppTheme.textMain,
+                  ),
                 ),
-                const SizedBox(height: AppConstants.spacingLg),
-                _buildSummaryCard(
-                  context, 
-                  'Total Deductions (YTD)', 
-                  '₹${summary.totalDeductionsYtd.toStringAsFixed(0)}', 
-                  Icons.money_off, 
-                  color: colorScheme.error
-                ),
-                const SizedBox(height: AppConstants.spacingLg),
-                _buildSummaryCard(
-                  context, 
-                  'Net Pay (YTD)', 
-                  '₹${summary.netPayYtd.toStringAsFixed(0)}', 
-                  Icons.payments, 
-                  color: Colors.green
-                ),
-                const SizedBox(height: AppConstants.spacing2Xl),
-                Text('Monthly Breakdown', style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: AppConstants.spacingLg),
-                ...summary.monthlyBreakdown.map((item) {
-                  return Card(
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: colorScheme.surfaceContainerHighest, 
-                        child: Icon(Icons.calendar_month, color: colorScheme.primary)
-                      ),
-                      title: Text(item.month),
-                      trailing: Text(
-                        '₹${item.amount.toStringAsFixed(0)}', 
-                        style: const TextStyle(fontWeight: FontWeight.bold)
-                      ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: DropdownButton<String>(
+                    value: _selectedYear,
+                    underline: const SizedBox(),
+                    icon: const Icon(
+                      Icons.arrow_drop_down,
+                      color: AppTheme.primaryBlue,
                     ),
-                  );
-                }),
+                    items: _years.map((String y) {
+                      return DropdownMenuItem<String>(
+                        value: y,
+                        child: Text(
+                          y,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.primaryBlue,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) setState(() => _selectedYear = val);
+                    },
+                  ),
+                ),
               ],
             ),
-          );
-        },
+          ),
+
+          // Horizontal Month Selector
+          Container(
+            height: 60,
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: _months.length,
+              itemBuilder: (context, idx) {
+                final m = _months[idx];
+                final isSelected = _selectedMonth == m;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: InkWell(
+                    onTap: () => setState(() => _selectedMonth = m),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppTheme.primaryBlue
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppTheme.primaryBlue
+                              : Colors.grey.shade300,
+                        ),
+                      ),
+                      child: Text(
+                        m,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : AppTheme.textMuted,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const Divider(height: 1),
+
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Payroll Components breakdown list
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Payroll Components',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 16,
+                          color: AppTheme.textMain,
+                        ),
+                      ),
+                      Text(
+                        '$_selectedMonth $_selectedYear',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: AppTheme.primaryBlue,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Earnings Section
+                  _buildSectionHeader('Earnings'),
+                  _buildComponentCard(
+                    'Basic Salary',
+                    components['Basic Salary']!,
+                  ),
+                  _buildComponentCard(
+                    'Housing Allowance',
+                    components['Housing Allowance']!,
+                  ),
+                  _buildComponentCard(
+                    'Transportation Allowance',
+                    components['Transportation Allowance']!,
+                  ),
+                  _buildComponentCard(
+                    'Other Allowance',
+                    components['Other Allowance']!,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Deductions Section
+                  _buildSectionHeader('Deductions'),
+                  _buildComponentCard(
+                    'Pension Fund - Employee',
+                    components['Pension Fund - Employee']!,
+                    isDeduction: true,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Grand Total Summary Block
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryBlue,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.primaryBlue.withValues(alpha: 0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Total Net Pay',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          'AED ${components['Total']!.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 20,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildSummaryCard(BuildContext context, String title, String amount, IconData icon, {Color? color}) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
-    return Container(
-      padding: const EdgeInsets.all(AppConstants.spacingXl),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
-        border: Border.all(color: colorScheme.outlineVariant),
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 4.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          color: AppTheme.textMuted,
+          letterSpacing: 0.5,
+        ),
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppConstants.spacingMd),
-            decoration: BoxDecoration(
-              color: (color ?? colorScheme.primary).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+    );
+  }
+
+  Widget _buildComponentCard(
+    String label,
+    double val, {
+    bool isDeduction = false,
+  }) {
+    return Card(
+      color: Colors.white,
+      margin: const EdgeInsets.only(bottom: 8),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: Colors.grey.shade100),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.textMain,
+              ),
             ),
-            child: Icon(icon, color: color ?? colorScheme.primary),
-          ),
-          const SizedBox(width: AppConstants.spacingLg),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: Theme.of(context).textTheme.labelLarge),
-                Text(
-                  amount, 
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold, 
-                    color: color ?? colorScheme.primary
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+            Text(
+              '${isDeduction ? "-" : ""} ${val.toStringAsFixed(2)}',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: isDeduction ? Colors.red.shade700 : AppTheme.textMain,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

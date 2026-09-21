@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_constants.dart';
-import '../../core/utils/dependency_injection.dart';
+import '../../core/providers/injection_providers.dart';
 import '../../core/widgets/custom_text_field.dart';
 
-class ChangePasswordScreen extends StatefulWidget {
+class ChangePasswordScreen extends ConsumerStatefulWidget {
   const ChangePasswordScreen({super.key});
 
   @override
-  State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+  ConsumerState<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
 }
 
-class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
+class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
@@ -22,8 +23,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       setState(() => _isLoading = true);
       
       try {
-        final employee = await DependencyInjection.profileService.getEmployeeProfile();
-        final success = await DependencyInjection.authService.changePassword(
+        final profileService = ref.read(profileServiceProvider);
+        final authService = ref.read(authServiceProvider);
+        
+        final employee = await profileService.getEmployeeProfile();
+        final success = await authService.changePassword(
           employee.id,
           _currentPasswordController.text,
           _newPasswordController.text,

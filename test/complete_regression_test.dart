@@ -1,9 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:icore_ess/app.dart';
-import 'package:icore_ess/core/utils/dependency_injection.dart';
-import 'package:icore_ess/services/location_service.dart';
 import 'test_utils.dart';
 
 void main() {
@@ -12,9 +11,7 @@ void main() {
 
   group('Complete Application Regression QA Pass', () {
     setUp(() {
-      DependencyInjection.reset();
       clearMockSecureStorage();
-      DependencyInjection.setDependencies(locationService: MockLocationService());
     });
 
     testWidgets('6. Settings and Logout Regression', (WidgetTester tester) async {
@@ -22,27 +19,28 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
 
-      await tester.pumpWidget(const ICoreEssApp());
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: ICoreEssApp(),
+        ),
+      );
       await tester.pumpAndBootstrap();
-      await tester.enterText(find.byKey(const Key('field_Employee ID')), 'EMP001');
-      await tester.enterText(find.byKey(const Key('field_Password')), '123456');
+      
+      await tester.enterText(find.byKey(const Key('field_Employee ID')), '20140');
+      await tester.enterText(find.byKey(const Key('field_Password')), 'Employee@123');
       await tester.tap(find.text('Login'));
-      await tester.pump();
-      await tester.pump(const Duration(seconds: 2));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.person_outline));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byIcon(Icons.settings));
-      await tester.pumpAndSettle();
-
-      final logoutButton = find.text('Logout');
-      await tester.ensureVisible(logoutButton);
-      await tester.tap(logoutButton);
-      await tester.pump();
-      await tester.pump(const Duration(seconds: 2));
+      // Go to Profile
+      await tester.tap(find.byIcon(Icons.person_outline).last);
       await tester.pumpAndSettle();
       
+      // Tap Logout
+      await tester.tap(find.text('Logout Account'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+
       expect(find.byKey(const Key('field_Employee ID')), findsOneWidget);
     });
   });

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/utils/dependency_injection.dart';
+import '../../core/providers/injection_providers.dart';
 
 class ReimbursementRow {
   final String type;
@@ -23,14 +24,14 @@ class ReimbursementRow {
   });
 }
 
-class ReimbursementScreen extends StatefulWidget {
+class ReimbursementScreen extends ConsumerStatefulWidget {
   const ReimbursementScreen({super.key});
 
   @override
-  State<ReimbursementScreen> createState() => _ReimbursementScreenState();
+  ConsumerState<ReimbursementScreen> createState() => _ReimbursementScreenState();
 }
 
-class _ReimbursementScreenState extends State<ReimbursementScreen> {
+class _ReimbursementScreenState extends ConsumerState<ReimbursementScreen> {
   DateTime _selectedDate = DateTime.now();
   String _documentType = 'General';
   final List<ReimbursementRow> _rows = [];
@@ -94,7 +95,11 @@ class _ReimbursementScreenState extends State<ReimbursementScreen> {
                     _buildDialogFieldLabel('Description'),
                     TextFormField(
                       controller: descController,
-                      decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 4)),
+                      decoration: const InputDecoration(
+                        isDense: true, 
+                        contentPadding: EdgeInsets.symmetric(vertical: 4),
+                        labelText: 'Description',
+                      ),
                       validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                     ),
                     const SizedBox(height: 12),
@@ -103,7 +108,11 @@ class _ReimbursementScreenState extends State<ReimbursementScreen> {
                     _buildDialogFieldLabel('Bill Reference No.'),
                     TextFormField(
                       controller: billRefController,
-                      decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 4)),
+                      decoration: const InputDecoration(
+                        isDense: true, 
+                        contentPadding: EdgeInsets.symmetric(vertical: 4),
+                        labelText: 'Bill Reference No.',
+                      ),
                     ),
                     const SizedBox(height: 12),
 
@@ -125,7 +134,11 @@ class _ReimbursementScreenState extends State<ReimbursementScreen> {
                     TextFormField(
                       controller: amountController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 4)),
+                      decoration: const InputDecoration(
+                        isDense: true, 
+                        contentPadding: EdgeInsets.symmetric(vertical: 4),
+                        labelText: 'Amount',
+                      ),
                       validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                     ),
                     const SizedBox(height: 12),
@@ -135,7 +148,11 @@ class _ReimbursementScreenState extends State<ReimbursementScreen> {
                     TextFormField(
                       controller: claimAmountController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 4)),
+                      decoration: const InputDecoration(
+                        isDense: true, 
+                        contentPadding: EdgeInsets.symmetric(vertical: 4),
+                        labelText: 'Claim Amount',
+                      ),
                       validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                     ),
                     const SizedBox(height: 12),
@@ -221,8 +238,9 @@ class _ReimbursementScreenState extends State<ReimbursementScreen> {
 
     setState(() => _isSubmitting = true);
     try {
+      final expenseService = ref.read(expenseServiceProvider);
       for (var row in _rows) {
-        await DependencyInjection.expenseService.submitReimbursement(
+        await expenseService.submitReimbursement(
           category: row.type,
           description: row.description,
           amount: row.claimAmount,
@@ -232,7 +250,6 @@ class _ReimbursementScreenState extends State<ReimbursementScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Reimbursement submitted successfully'), backgroundColor: AppTheme.success),
         );
-        Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
@@ -248,7 +265,7 @@ class _ReimbursementScreenState extends State<ReimbursementScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFFDFCFD),
       appBar: AppBar(
-        title: const Text('Reimbursement'),
+        title: const Text('Reimbursements'),
         backgroundColor: AppTheme.primaryBlue,
         foregroundColor: Colors.white,
         leading: IconButton(
@@ -436,14 +453,12 @@ class _ReimbursementScreenState extends State<ReimbursementScreen> {
   Widget _buildRowDetail(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6.0),
-      child: RichText(
-        text: TextSpan(
-          style: const TextStyle(color: Colors.black87, fontSize: 14, height: 1.4),
-          children: [
-            TextSpan(text: '$label: ', style: const TextStyle(fontWeight: FontWeight.bold)),
-            TextSpan(text: value),
-          ],
-        ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('$label: ', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87)),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 14, color: Colors.black87))),
+        ],
       ),
     );
   }

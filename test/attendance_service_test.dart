@@ -2,6 +2,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:icore_ess/core/errors/app_exceptions.dart';
 import 'package:icore_ess/models/attendance.dart';
 import 'package:icore_ess/models/employee.dart';
+import 'package:icore_ess/models/employment.dart';
+import 'package:icore_ess/models/personal_info.dart';
+import 'package:icore_ess/models/family.dart';
+import 'package:icore_ess/models/bank.dart';
+import 'package:icore_ess/models/education.dart';
+import 'package:icore_ess/models/skill.dart';
+import 'package:icore_ess/models/identity.dart';
+import 'package:icore_ess/models/work_history.dart';
+import 'package:icore_ess/models/certificate.dart';
+import 'package:icore_ess/models/pending_request.dart';
 import 'package:icore_ess/repositories/attendance_repository.dart';
 import 'package:icore_ess/repositories/profile_repository.dart';
 import 'package:icore_ess/services/attendance_service.dart';
@@ -24,6 +34,9 @@ class MockAttendanceRepo implements AttendanceRepository {
     record = record.copyWith(status: AttendanceStatus.checkedOut);
     return true;
   }
+
+  @override
+  Future<List<AttendanceRecord>> getAttendanceHistory() async => [];
 }
 
 class MockProfileRepo implements ProfileRepository {
@@ -38,6 +51,41 @@ class MockProfileRepo implements ProfileRepository {
     joiningDate: '2020-01-01',
     profileImageUrl: '',
   );
+
+  @override
+  Future<EmployeeEmployment> getEmploymentSummary() async => EmployeeEmployment(
+    employeeId: 'EMP001',
+    legacyId: 'LEG123',
+    joiningDate: '2020-01-01',
+    grade: 'A',
+    employmentType: 'Permanent',
+    pointOfHire: 'Test Office',
+    department: 'IT',
+    designation: 'Dev',
+    location: 'Test Location',
+    yearsOfService: '4 Years',
+  );
+
+  @override
+  Future<PersonalInformation> getPersonalInformation() async => throw UnimplementedError();
+  @override
+  Future<List<FamilyMember>> getFamilyInformation() async => [];
+  @override
+  Future<BankInformation> getBankInformation() async => throw UnimplementedError();
+  @override
+  Future<List<EducationRecord>> getEducationHistory() async => [];
+  @override
+  Future<List<EducationDocument>> getEducationDocuments() async => [];
+  @override
+  Future<List<Skill>> getSkills() async => [];
+  @override
+  Future<List<IdentityDocument>> getIdentityDocuments() async => [];
+  @override
+  Future<List<WorkExperience>> getWorkHistory() async => [];
+  @override
+  Future<List<Certificate>> getCertificates() async => [];
+  @override
+  Future<List<PendingRequest>> getProfileUpdateRequests() async => [];
 }
 
 class StaticLocationService implements LocationService {

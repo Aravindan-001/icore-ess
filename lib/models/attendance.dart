@@ -17,6 +17,27 @@ class AttendanceRecord {
     required this.status,
   });
 
+  factory AttendanceRecord.fromJson(Map<String, dynamic> json) {
+    return AttendanceRecord(
+      date: DateTime.parse(json['date']),
+      checkInTime: json['checkInTime'] != null ? DateTime.parse(json['checkInTime']) : null,
+      checkOutTime: json['checkOutTime'] != null ? DateTime.parse(json['checkOutTime']) : null,
+      status: AttendanceStatus.values.firstWhere(
+        (e) => e.toString().split('.').last == json['status'],
+        orElse: () => AttendanceStatus.notMarked,
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'date': date.toIso8601String(),
+      'checkInTime': checkInTime?.toIso8601String(),
+      'checkOutTime': checkOutTime?.toIso8601String(),
+      'status': status.toString().split('.').last,
+    };
+  }
+
   AttendanceRecord copyWith({
     DateTime? checkInTime,
     DateTime? checkOutTime,

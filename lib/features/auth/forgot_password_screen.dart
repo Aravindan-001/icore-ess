@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_constants.dart';
-import '../../core/utils/dependency_injection.dart';
+import '../../core/providers/injection_providers.dart';
 import '../../core/widgets/custom_text_field.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _idController = TextEditingController();
   bool _isLoading = false;
@@ -20,7 +21,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       setState(() => _isLoading = true);
       
       try {
-        final success = await DependencyInjection.authService.forgotPassword(_idController.text);
+        final authService = ref.read(authServiceProvider);
+        final success = await authService.forgotPassword(_idController.text);
         
         if (mounted) {
           setState(() => _isLoading = false);

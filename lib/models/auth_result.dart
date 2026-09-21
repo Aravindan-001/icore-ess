@@ -23,6 +23,27 @@ class AuthResult {
     this.employee,
   });
 
+  factory AuthResult.fromJson(Map<String, dynamic> json) {
+    return AuthResult(
+      status: AuthStatus.values.firstWhere(
+        (e) => e.toString().split('.').last == json['status'],
+        orElse: () => AuthStatus.unknown,
+      ),
+      message: json['message'],
+      token: json['token'],
+      employee: json['employee'] != null ? Employee.fromJson(json['employee']) : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status.toString().split('.').last,
+      'message': message,
+      'token': token,
+      'employee': employee?.toJson(),
+    };
+  }
+
   factory AuthResult.success({String? token, Employee? employee}) {
     return AuthResult(status: AuthStatus.success, token: token, employee: employee);
   }

@@ -16,6 +16,11 @@ class NetworkException extends AppException {
       : super(message, 'Network Error: ');
 }
 
+class TimeoutException extends AppException {
+  TimeoutException([String message = 'Request timeout'])
+      : super(message, 'Timeout Error: ');
+}
+
 class ServerException extends AppException {
   ServerException([String message = 'Internal Server Error'])
       : super(message, 'Server Error: ');
@@ -32,6 +37,11 @@ class AuthenticationException extends AppException {
       : super(message, 'Auth Error: ');
 }
 
+class AuthorizationException extends AppException {
+  AuthorizationException([String message = 'Unauthorized access'])
+      : super(message, 'Authorization Error: ');
+}
+
 class SessionExpiredException extends AppException {
   SessionExpiredException([String message = 'Session has expired. Please login again.'])
       : super(message, 'Session Error: ');
@@ -39,6 +49,14 @@ class SessionExpiredException extends AppException {
 
 class ValidationException extends AppException {
   ValidationException(String message) : super(message, 'Validation Error: ');
+}
+
+class ParsingException extends AppException {
+  ParsingException(String message) : super(message, 'Parsing Error: ');
+}
+
+class IntegrationException extends AppException {
+  IntegrationException(String message) : super(message, 'Integration Error: ');
 }
 
 class LocationException extends AppException {

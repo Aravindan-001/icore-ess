@@ -1,99 +1,130 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/utils/dependency_injection.dart';
+import '../../core/providers/injection_providers.dart';
+import 'leave_provider.dart';
 
-class ApplyLeaveScreen extends StatefulWidget {
+class ApplyLeaveScreen extends ConsumerStatefulWidget {
   const ApplyLeaveScreen({super.key});
 
   @override
-  State<ApplyLeaveScreen> createState() => _ApplyLeaveScreenState();
+  ConsumerState<ApplyLeaveScreen> createState() => _ApplyLeaveScreenState();
 }
 
-class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
+class _ApplyLeaveScreenState extends ConsumerState<ApplyLeaveScreen> {
   final _formKey = GlobalKey<FormState>();
-  String _selectedLeaveType = 'Annual Leave';
-  DateTime _startDate = DateTime.now();
-  DateTime _endDate = DateTime.now();
-  bool _startHalfDay = false;
-  bool _endHalfDay = false;
+  String? _selectedLeaveType = 'Annual Leave';
+  DateTime? _startDate;
+  DateTime? _endDate;
   final _reasonController = TextEditingController();
-  final _commentController = TextEditingController();
-  bool _isSubmitting = false;
 
-  final List<String> _leaveTypes = ['Annual Leave', 'Sick Leave', 'Casual Leave', 'Maternity Leave', 'Paternity Leave'];
+  final List<String> _leaveTypes = ['Annual Leave', 'Sick Leave', 'Casual Leave', 'Roster Leave'];
 
-  Future<void> _selectDate(BuildContext context, bool isStart) async {
-    final DateTime? picked = await showDatePicker(
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectStartDate(BuildContext context) async {
+    final picked = await showDatePicker(
       context: context,
-      initialDate: isStart ? _startDate : _endDate,
-      firstDate: DateTime.now().subtract(const Duration(days: 30)),
+      initialDate: _startDate ?? DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (picked != null) {
       setState(() {
-        if (isStart) {
-          _startDate = picked;
-          if (_endDate.isBefore(_startDate)) {
-            _endDate = _startDate;
-          }
-        } else {
-          if (picked.isBefore(_startDate)) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('To date cannot be before From date')),
-            );
-          } else {
-            _endDate = picked;
-          }
+        _startDate = picked;
+        if (_endDate != null && _endDate!.isBefore(_startDate!)) {
+          _endDate = null;
         }
+      });
+    }
+  }
+
+  Future<void> _selectEndDate(BuildContext context) async {
+    if (_startDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a start date first.')),
+      );
+      return;
+    }
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _endDate ?? _startDate!,
+      firstDate: _startDate!,
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null) {
+      setState(() {
+        _endDate = picked;
       });
     }
   }
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      setState(() => _isSubmitting = true);
-      try {
-        final success = await DependencyInjection.leaveService.applyLeave(
-          type: _selectedLeaveType,
-          startDate: _startDate,
-          endDate: _endDate,
-          reason: _reasonController.text,
+      if (_startDate == null || _endDate == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Start and End dates are required.')),
         );
-        if (success && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Leave application submitted successfully'), backgroundColor: AppTheme.success),
+        return;
+      }
+
+      if (_endDate!.isBefore(_startDate!)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('End date cannot be before start date.')),
+        );
+        return;
+      }
+
+      final success = await ref.read(applyLeaveNotifierProvider.notifier).submitLeave(
+            type: _selectedLeaveType!,
+            startDate: _startDate!,
+            endDate: _endDate!,
+            reason: _reasonController.text,
           );
-          Navigator.pop(context);
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.error),
-          );
-        }
-      } finally {
-        if (mounted) setState(() => _isSubmitting = false);
+
+      if (success && mounted) {
+        final submissionState = ref.read(applyLeaveNotifierProvider);
+        ref.read(analyticsServiceProvider).logEvent('request_submitted');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Leave application submitted. ID: ${submissionState.successRequestId}'),
+            backgroundColor: AppTheme.success,
+          ),
+        );
+        ref.read(applyLeaveNotifierProvider.notifier).reset();
+        Navigator.pop(context);
+      } else if (mounted) {
+        final submissionState = ref.read(applyLeaveNotifierProvider);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(submissionState.errorMessage ?? 'Submission failed.'),
+            backgroundColor: AppTheme.error,
+          ),
+        );
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final submissionState = ref.watch(applyLeaveNotifierProvider);
+    final isLoading = submissionState.isLoading;
+
+    final startText = _startDate != null ? DateFormat('dd MMM yyyy').format(_startDate!) : 'Select Start Date';
+    final endText = _endDate != null ? DateFormat('dd MMM yyyy').format(_endDate!) : 'Select End Date';
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFDFCFD), // Soft white background
       appBar: AppBar(
-        title: const Text('Add Leave Request'),
+        title: const Text('Apply Leave'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => DependencyInjection.authService.logout(context),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -102,132 +133,83 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Leave Type Dropdown
-              _buildFieldLabel('Leave type'),
+              _buildFieldLabel('Leave Type'),
               DropdownButtonFormField<String>(
                 initialValue: _selectedLeaveType,
-                decoration: _buildInputDecoration(hint: 'Select leave type'),
-                items: _leaveTypes.map((type) => DropdownMenuItem(value: type, child: Text(type))).toList(),
-                onChanged: (value) => setState(() => _selectedLeaveType = value!),
-                validator: (value) => value == null ? 'Required' : null,
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                items: _leaveTypes.map((type) {
+                  return DropdownMenuItem(value: type, child: Text(type));
+                }).toList(),
+                onChanged: isLoading ? null : (val) => setState(() => _selectedLeaveType = val),
+                validator: (val) => val == null ? 'Leave type is required' : null,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-              // From Date
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildFieldLabel('From'),
-                        InkWell(
-                          onTap: () => _selectDate(context, true),
-                          child: InputDecorator(
-                            decoration: _buildInputDecoration(hint: 'Select date'),
-                            child: Text(
-                              DateFormat('dd-MM-yyyy').format(_startDate),
-                              style: const TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ),
-                      ],
+              _buildFieldLabel('Start Date'),
+              InkWell(
+                onTap: isLoading ? null : () => _selectStartDate(context),
+                borderRadius: BorderRadius.circular(16),
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.calendar_today, color: AppTheme.primaryBlue),
+                  ),
+                  child: Text(
+                    startText,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: _startDate != null ? AppTheme.textMain : AppTheme.textMuted,
+                      fontWeight: _startDate != null ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: _buildHalfDayCheckbox('Half-day', _startHalfDay, (val) => setState(() => _startHalfDay = val!)),
-                  ),
-                ],
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-              // To Date
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildFieldLabel('To'),
-                        InkWell(
-                          onTap: () => _selectDate(context, false),
-                          child: InputDecorator(
-                            decoration: _buildInputDecoration(hint: 'Select date'),
-                            child: Text(
-                              DateFormat('dd-MM-yyyy').format(_endDate),
-                              style: const TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ),
-                      ],
+              _buildFieldLabel('End Date'),
+              InkWell(
+                onTap: isLoading ? null : () => _selectEndDate(context),
+                borderRadius: BorderRadius.circular(16),
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.calendar_today, color: AppTheme.primaryBlue),
+                  ),
+                  child: Text(
+                    endText,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: _endDate != null ? AppTheme.textMain : AppTheme.textMuted,
+                      fontWeight: _endDate != null ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: _buildHalfDayCheckbox('Half-day', _endHalfDay, (val) => setState(() => _endHalfDay = val!)),
-                  ),
-                ],
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-              // Reason
               _buildFieldLabel('Reason'),
               TextFormField(
                 controller: _reasonController,
-                maxLines: 3,
-                decoration: _buildInputDecoration(),
-                validator: (value) => value == null || value.isEmpty ? 'Required' : null,
-              ),
-              const SizedBox(height: 16),
-
-              // Comment
-              _buildFieldLabel('Comment'),
-              TextFormField(
-                controller: _commentController,
-                maxLines: 2,
-                decoration: _buildInputDecoration(),
-              ),
-              const SizedBox(height: 24),
-
-              // Attach File
-              OutlinedButton.icon(
-                onPressed: () {
-                  // Attachment functionality mock/disabled as per instructions
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('File attachment not yet implemented')),
-                  );
-                },
-                icon: const Icon(Icons.attachment),
-                label: const Text('Attach File'),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  side: const BorderSide(color: Color(0xFFE2E2E2)),
+                maxLines: 4,
+                enabled: !isLoading,
+                decoration: const InputDecoration(
+                  hintText: 'Enter detailed reason for leave application',
                 ),
+                validator: (val) => val == null || val.trim().isEmpty ? 'Reason is required' : null,
               ),
               const SizedBox(height: 32),
 
-              // Submit Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _isSubmitting ? null : _submitForm,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00796B), // Success green/teal from screenshot
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                  ),
-                  child: _isSubmitting
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : const Text('Submit', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  onPressed: isLoading ? null : _submitForm,
+                  child: isLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Text('Submit Application'),
                 ),
               ),
             ],
@@ -239,38 +221,15 @@ class _ApplyLeaveScreenState extends State<ApplyLeaveScreen> {
 
   Widget _buildFieldLabel(String label) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         label,
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.grey),
-      ),
-    );
-  }
-
-  InputDecoration _buildInputDecoration({String? hint}) {
-    return InputDecoration(
-      hintText: hint,
-      filled: true,
-      fillColor: const Color(0xFFEBEAEF), // Light grey fill from screenshot
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(4),
-        borderSide: BorderSide.none,
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-    );
-  }
-
-  Widget _buildHalfDayCheckbox(String label, bool value, ValueChanged<bool?> onChanged) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(label, style: const TextStyle(fontSize: 14)),
-        Checkbox(
-          value: value,
-          onChanged: onChanged,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: AppTheme.textMuted,
         ),
-      ],
+      ),
     );
   }
 }

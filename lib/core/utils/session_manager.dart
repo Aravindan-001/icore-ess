@@ -10,17 +10,23 @@ class SessionManager {
   static const String _keyEmployeeId = 'employee_id';
   static const String _keyRememberMe = 'remember_me';
   static const String _keyRememberedId = 'remembered_id';
+  static const String _keyUserRole = 'user_role';
 
   /// Saves the session data after successful authentication.
   static Future<void> saveSession({
     String? token,
     String? sessionId,
     String? employeeId,
+    String? role,
   }) async {
     if (token != null) await _storage.write(key: _keyToken, value: token);
     if (sessionId != null) await _storage.write(key: _keySessionId, value: sessionId);
     if (employeeId != null) await _storage.write(key: _keyEmployeeId, value: employeeId);
+    if (role != null) await _storage.write(key: _keyUserRole, value: role);
   }
+
+  /// Retrieves the stored user role.
+  static Future<String?> getUserRole() async => await _storage.read(key: _keyUserRole);
 
   /// Retrieves the stored authentication token.
   static Future<String?> getToken() async => await _storage.read(key: _keyToken);
@@ -36,6 +42,7 @@ class SessionManager {
     await _storage.delete(key: _keyToken);
     await _storage.delete(key: _keySessionId);
     await _storage.delete(key: _keyEmployeeId);
+    await _storage.delete(key: _keyUserRole);
   }
 
   /// Persistence for Remember Me functionality

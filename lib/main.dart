@@ -4,6 +4,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'firebase_options.dart';
 import 'app.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,5 +30,9 @@ void main() async {
   await FirebaseCrashlytics.instance.setCustomKey('app_version', '1.0.0+1');
   await FirebaseCrashlytics.instance.setCustomKey('environment', kDebugMode ? 'development' : 'production');
 
-  runApp(const ICoreEssApp());
+  runApp(
+    const ProviderScope(
+      child: ICoreEssApp(),
+    ),
+  );
 }

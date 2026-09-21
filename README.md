@@ -221,7 +221,7 @@ The application has been validated through automated tests, static analysis, bui
 
 | Validation           | Result |
 | -------------------- | -----: |
-| Automated test cases |     41 |
+| Automated test cases |     74 |
 | Test failures        |      0 |
 | Flutter Analyze      | Passed |
 | Release APK build    | Passed |
@@ -267,9 +267,17 @@ flutter build apk --release
 
 The current frontend prototype includes demo authentication credentials:
 
+### Employee
 ```text
-Employee ID: EMP001
-Password: 123456
+Employee ID: 20140
+Password: Employee@123
+Name: ANITHA K
+```
+
+### HR
+```text
+Employee ID: HR001
+Password: HR@12345
 ```
 
 > These credentials are intended only for the current mock/demo environment. They must not be used for production authentication.
@@ -305,83 +313,27 @@ Before production deployment, the backend integration should additionally define
 
 ## Backend Integration
 
-The current application uses `MockEssRepository` and related mock repository implementations for frontend development and testing.
+The application supports both Mock and SOAP backend implementations using a provider-based switching mechanism.
 
-### Current Data Flow
+### Current Status
+**Status: Ready for SOAP/WSDL Integration**
+The architecture is prepared with a `SoapClient` transport layer and `SoapEssRepository` implementation structure. Real integration is currently blocked awaiting the client's WSDL contract.
 
-```text
-Flutter Application
-        ↓
-Application Services
-        ↓
-Repository Contracts
-        ↓
-Mock Repository
-        ↓
-Mock Data
-```
+### Backend Switching
+The backend can be selected at build time using the `ESS_BACKEND` environment variable:
 
-### Planned Production Data Flow
-
-```text
-Flutter Application
-        ↓
-Application Services
-        ↓
-Repository Contracts
-        ↓
-SOAP/XML Repository
-        ↓
-SOAP Request
-        ↓
-Client HR / Backend System
-        ↓
-SOAP XML Response
-        ↓
-Application Models
-        ↓
-Flutter UI
-```
-
-### Planned Production Attendance Flow
-
-```text
-Real Device GPS
-        ↓
-Client-Side Geofence Check
-        ↓
-Attendance Service
-        ↓
-SOAP/XML Request
-        ↓
-Server-Side Identity and Geofence Validation
-        ↓
-Attendance Persistence
-        ↓
-SOAP/XML Response
-        ↓
-Updated Attendance State
-```
-
-The backend should remain the final authority for attendance verification and persistence.
+- **Mock (Default)**: `flutter run --dart-define=ESS_BACKEND=mock`
+- **SOAP**: `flutter run --dart-define=ESS_BACKEND=soap`
 
 ### SOAP Integration Prerequisites
-
 Production integration requires the following information from the client:
-
-* WSDL file or SOAP service documentation
-* Service endpoint URLs
-* SOAP namespaces
-* Authentication mechanism
-* SOAP action names
-* Request and response XML schemas
-* Employee authentication contract
-* Attendance request and response contract
-* Employee profile contract
-* Leave and payroll contracts
-* SOAP fault/error format
-* Network and VPN requirements
-* Production and testing environment details
+- WSDL file or SOAP service documentation
+- Service endpoint URLs
+- SOAP namespaces
+- Authentication mechanism (e.g., SOAP Headers, Token-based)
+- SOAP action names
+- Request and response XML schemas
+- Environment details (Dev/UAT/Prod)
 
 ---
 
@@ -420,7 +372,8 @@ test/
 ├── navigation_test.dart
 ├── orders_test.dart
 ├── payroll_test.dart
-├── profile_settings_test.dart
+├── profile_settings
+_test.dart
 ├── repository_test.dart
 ├── security_rules_test.dart
 └── widget_test.dart

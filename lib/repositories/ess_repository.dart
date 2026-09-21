@@ -2,6 +2,9 @@ import 'auth_repository.dart';
 import 'attendance_repository.dart';
 import 'leave_repository.dart';
 import 'payroll_repository.dart';
+import 'overtime_repository.dart';
+import 'airfare_repository.dart';
+import 'education_repository.dart';
 import 'profile_repository.dart';
 import 'expense_repository.dart';
 import 'order_repository.dart';
@@ -15,6 +18,9 @@ abstract class EssRepository
         AttendanceRepository, 
         LeaveRepository, 
         PayrollRepository, 
+        OvertimeRepository,
+        AirfareRepository,
+        EducationRepository,
         ProfileRepository, 
         ExpenseRepository, 
         OrderRepository, 

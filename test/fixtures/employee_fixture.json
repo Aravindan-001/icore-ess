@@ -1,0 +1,10 @@
+{
+  "id": "EMP001",
+  "name": "Aravind Kumar",
+  "email": "aravind.kumar@ebaconnect.com",
+  "phone": "+91 9876543210",
+  "department": "Information Technology",
+  "designation": "Software Engineer",
+  "joiningDate": "15 Jan 2022",
+  "profileImageUrl": "https://example.com/profiles/emp001.png"
+}

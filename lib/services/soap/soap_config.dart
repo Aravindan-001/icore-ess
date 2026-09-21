@@ -24,21 +24,30 @@ class SoapConfig {
   factory SoapConfig.dev() {
     return SoapConfig(
       environment: AppEnvironment.development,
-      baseUrl: 'https://dev-ess.ebaconnect.com/services',
+      baseUrl: const String.fromEnvironment(
+        'SOAP_BASE_URL_DEV',
+        defaultValue: 'https://dev-ess.ebaconnect.com/services',
+      ),
     );
   }
 
   factory SoapConfig.uat() {
     return SoapConfig(
       environment: AppEnvironment.uat,
-      baseUrl: 'https://uat-ess.ebaconnect.com/services',
+      baseUrl: const String.fromEnvironment(
+        'SOAP_BASE_URL_UAT',
+        defaultValue: 'https://uat-ess.ebaconnect.com/services',
+      ),
     );
   }
 
   factory SoapConfig.prod() {
     return SoapConfig(
       environment: AppEnvironment.production,
-      baseUrl: 'https://ess.ebaconnect.com/services',
+      baseUrl: const String.fromEnvironment(
+        'SOAP_BASE_URL_PROD',
+        defaultValue: 'https://ess.ebaconnect.com/services',
+      ),
     );
   }
 }

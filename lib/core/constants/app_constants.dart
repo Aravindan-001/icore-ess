@@ -8,9 +8,28 @@ class AppConstants {
   static const String dashboardRoute = '/dashboard';
   static const String mainRoute = '/main';
   static const String profileRoute = '/profile';
+  static const String personalInfoLandingRoute = '/profile/personal-info';
+  static const String basicInfoRoute = '/profile/basic-info';
+  static const String familyInfoRoute = '/profile/family';
+  static const String bankInfoRoute = '/profile/bank';
+  static const String educationRoute = '/profile/education';
+  static const String educationDocsRoute = '/profile/education-docs';
+  static const String skillsRoute = '/profile/skills';
+  static const String identityRoute = '/profile/identity';
+  static const String workHistoryRoute = '/profile/work-history';
+  static const String certificatesRoute = '/profile/certificates';
+  static const String profileRequestsRoute = '/profile/requests';
   static const String leaveRoute = '/leave';
   static const String leaveApplyRoute = '/leave/apply';
+  static const String salaryBenefitsRoute = '/salary-benefits';
   static const String payslipRoute = '/payslip';
+  static const String payslipDetailRoute = '/payslip/detail';
+  static const String overtimeRoute = '/overtime';
+  static const String overtimeDetailRoute = '/overtime/detail';
+  static const String airfareRoute = '/airfare';
+  static const String airfareDetailRoute = '/airfare/detail';
+  static const String educationDeclarationRoute = '/education-declaration';
+  static const String educationDeclarationDetailRoute = '/education-declaration/detail';
   static const String paySummaryRoute = '/pay-summary';
   static const String reimbursementRoute = '/reimbursement';
   static const String claimsRoute = '/claims';
@@ -20,6 +39,7 @@ class AppConstants {
   static const String requestsRoute = '/requests';
   static const String settingsRoute = '/settings';
   static const String attendanceRoute = '/attendance';
+  static const String documentsRoute = '/documents';
 
   // Office Location Constants
   static const double officeLatitude = 13.0827;

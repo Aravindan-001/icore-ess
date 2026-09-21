@@ -22,29 +22,19 @@ class ServicesScreen extends StatelessWidget {
             onTap: () => Navigator.pushNamed(context, AppConstants.leaveRoute),
           ),
           ServiceCard(
-            title: 'Payslip',
-            icon: Icons.receipt_long,
-            onTap: () => Navigator.pushNamed(context, AppConstants.payslipRoute),
-          ),
-          ServiceCard(
-            title: 'Pay Summary',
-            icon: Icons.summarize,
-            onTap: () => Navigator.pushNamed(context, AppConstants.paySummaryRoute),
-          ),
-          ServiceCard(
-            title: 'Claims',
-            icon: Icons.request_quote,
-            onTap: () => Navigator.pushNamed(context, AppConstants.claimsRoute),
-          ),
-          ServiceCard(
-            title: 'Reimburse',
+            title: 'Salary & Benefits',
             icon: Icons.payments,
-            onTap: () => Navigator.pushNamed(context, AppConstants.reimbursementRoute),
+            onTap: () => Navigator.pushNamed(context, AppConstants.salaryBenefitsRoute),
           ),
           ServiceCard(
             title: 'Attendance',
             icon: Icons.fingerprint,
             onTap: () => Navigator.pushNamed(context, AppConstants.attendanceRoute),
+          ),
+          ServiceCard(
+            title: 'Claims',
+            icon: Icons.request_quote,
+            onTap: () => Navigator.pushNamed(context, AppConstants.claimsRoute),
           ),
           ServiceCard(
             title: 'Pre Order',

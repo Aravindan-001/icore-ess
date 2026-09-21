@@ -8,9 +8,9 @@ void main() {
     final repository = MockEssRepository();
 
     test('login with correct credentials returns success', () async {
-      final result = await repository.login('EMP001', '123456');
+      final result = await repository.login('20140', 'Employee@123');
       expect(result.isSuccess, true);
-      expect(result.employee?.name, 'Aravind Kumar');
+      expect(result.employee?.name, 'ANITHA K');
     });
 
     test('login with incorrect credentials returns failure', () async {
@@ -19,9 +19,10 @@ void main() {
     });
 
     test('getEmployeeProfile returns mock data', () async {
+      await repository.login('20140', 'Employee@123');
       final employee = await repository.getEmployeeProfile();
-      expect(employee.name, 'Aravind Kumar');
-      expect(employee.id, 'EMP001');
+      expect(employee.name, 'ANITHA K');
+      expect(employee.id, '20140');
     });
 
     test('getLeaveBalances returns list', () async {
@@ -44,7 +45,7 @@ void main() {
     test('Attendance sequential rules', () async {
       final now = DateTime.now();
       final request = AttendanceRequest(
-        employeeId: 'EMP001',
+        employeeId: '20140',
         action: 'CHECK_IN',
         deviceTime: now,
         latitude: 0,
@@ -76,7 +77,7 @@ void main() {
       
       // Check out
       final checkOutRequest = AttendanceRequest(
-        employeeId: 'EMP001',
+        employeeId: '20140',
         action: 'CHECK_OUT',
         deviceTime: now,
         latitude: 0,

@@ -99,4 +99,6 @@ class AttendanceService {
 
     return await _attendanceRepo.checkOut(request);
   }
+
+  Future<List<AttendanceRecord>> getAttendanceHistory() => _attendanceRepo.getAttendanceHistory();
 }

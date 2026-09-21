@@ -9,4 +9,6 @@ class PayrollService {
 
   Future<List<Payslip>> getPayslips() => _payrollRepo.getPayslips();
   Future<PaySummary> getPaySummary() => _payrollRepo.getPaySummary();
+  Future<PayslipDetail> getPayslipDetail(String year, String month) => 
+      _payrollRepo.getPayslipDetail(year, month);
 }

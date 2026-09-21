@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/custom_text_field.dart';
-import '../../core/utils/dependency_injection.dart';
+import '../../core/providers/injection_providers.dart';
 import '../../models/claim.dart';
 
-class ClaimsScreen extends StatefulWidget {
+class ClaimsScreen extends ConsumerStatefulWidget {
   const ClaimsScreen({super.key});
 
   @override
-  State<ClaimsScreen> createState() => _ClaimsScreenState();
+  ConsumerState<ClaimsScreen> createState() => _ClaimsScreenState();
 }
 
-class _ClaimsScreenState extends State<ClaimsScreen> {
+class _ClaimsScreenState extends ConsumerState<ClaimsScreen> {
   List<MedicalClaim> _claims = [];
   bool _isLoading = true;
   final _descController = TextEditingController();
@@ -27,7 +28,8 @@ class _ClaimsScreenState extends State<ClaimsScreen> {
   Future<void> _fetchClaims() async {
     setState(() => _isLoading = true);
     try {
-      final claims = await DependencyInjection.expenseService.getMedicalClaims();
+      final expenseService = ref.read(expenseServiceProvider);
+      final claims = await expenseService.getMedicalClaims();
       if (mounted) {
         setState(() {
           _claims = claims;
@@ -99,7 +101,8 @@ class _ClaimsScreenState extends State<ClaimsScreen> {
                     setModalState(() => isSubmitting = true);
                     
                     try {
-                      final success = await DependencyInjection.expenseService.submitMedicalClaim(
+                      final expenseService = ref.read(expenseServiceProvider);
+                      final success = await expenseService.submitMedicalClaim(
                         type: typeController.text,
                         description: _descController.text,
                         amount: double.tryParse(_amountController.text) ?? 0.0,

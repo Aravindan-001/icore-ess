@@ -72,10 +72,12 @@ mixin LocationCalculator {
 class MockLocationService with LocationCalculator implements LocationService {
   double mockLat = AppConstants.officeLatitude;
   double mockLon = AppConstants.officeLongitude;
+  double mockAccuracy = 5.0;
 
-  void setMockLocation(double lat, double lon) {
+  void setMockLocation(double lat, double lon, {double accuracy = 5.0}) {
     mockLat = lat;
     mockLon = lon;
+    mockAccuracy = accuracy;
   }
 
   @override
@@ -89,9 +91,10 @@ class MockLocationService with LocationCalculator implements LocationService {
     return LocationResult(
       latitude: mockLat,
       longitude: mockLon,
-      accuracy: 5.0,
+      accuracy: mockAccuracy,
       distanceFromOffice: distance,
-      isWithinGeofence: distance <= AppConstants.allowedRadiusInMeters,
+      isWithinGeofence: distance <= AppConstants.allowedRadiusInMeters && 
+                       mockAccuracy <= AppConstants.maxAllowedAccuracyInMeters,
     );
   }
 

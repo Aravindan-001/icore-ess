@@ -31,7 +31,6 @@ class CustomTextField extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Column(
-      key: textFieldKey ?? Key('field_$label'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
@@ -45,6 +44,7 @@ class CustomTextField extends StatelessWidget {
           ),
         ),
         TextFormField(
+          key: textFieldKey ?? Key('field_$label'),
           controller: controller,
           obscureText: isPassword,
           keyboardType: keyboardType,

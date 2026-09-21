@@ -17,6 +17,7 @@ class AuthService {
       await SessionManager.saveSession(
         token: result.token,
         employeeId: employeeId,
+        role: result.employee?.role.toString().split('.').last,
       );
 
       if (rememberMe) {

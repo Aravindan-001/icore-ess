@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:icore_ess/app.dart';
 import 'test_utils.dart';
 
@@ -8,36 +9,32 @@ void main() {
   HttpOverrides.global = MockHttpOverrides();
   setupSecureStorageMock();
 
-  testWidgets('Orders modules verification', (WidgetTester tester) async {
-    tester.view.physicalSize = const Size(1080, 2400);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(() => tester.view.resetPhysicalSize());
+  group('Orders modules verification', () {
+    setUp(() {
+      clearMockSecureStorage();
+    });
 
-    await tester.pumpWidget(const ICoreEssApp());
-    await tester.pumpAndBootstrap();
-    await tester.enterText(find.byKey(const Key('field_Employee ID')), 'EMP001');
-    await tester.enterText(find.byKey(const Key('field_Password')), '123456');
-    await tester.tap(find.text('Login'));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 2));
-    await tester.pumpAndSettle();
+    Future<void> loginAndNavigate(WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
 
-    await tester.tap(find.text('Orders'));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pump();
-    expect(find.text('Company Store'), findsOneWidget);
-    
-    await tester.pageBack();
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(const ProviderScope(child: ICoreEssApp()));
+      await tester.pumpAndBootstrap();
+      await tester.enterText(find.byKey(const Key('field_Employee ID')), '20140');
+      await tester.enterText(find.byKey(const Key('field_Password')), 'Employee@123');
+      await tester.tap(find.text('Login'));
+      await tester.pumpAndSettle();
+    }
 
-    await tester.tap(find.byIcon(Icons.grid_view_outlined));
-    await tester.pumpAndSettle();
-    
-    await tester.tap(find.text('Sales Order'));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pump();
-    expect(find.text('Sales Orders'), findsOneWidget);
+    testWidgets('Orders modules verification', (WidgetTester tester) async {
+      await loginAndNavigate(tester);
+      final ordersFinder = find.widgetWithText(InkWell, 'Orders');
+      await tester.ensureVisible(ordersFinder);
+      await tester.tap(ordersFinder);
+      await tester.pumpAndSettle();
+      expect(find.text('Sales Orders'), findsOneWidget);
+      expect(find.text('Order #SO-005'), findsOneWidget);
+    });
   });
 }
