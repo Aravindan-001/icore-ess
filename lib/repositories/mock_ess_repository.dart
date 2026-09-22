@@ -118,6 +118,40 @@ class MockEssRepository implements EssRepository {
       isRead: true,
       category: NotificationCategory.system,
     ),
+    AppNotification(
+      id: '7',
+      title: 'Public Holiday',
+      message: 'Tomorrow is a public holiday for Islamic New Year.',
+      timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+      category: NotificationCategory.general,
+    ),
+    AppNotification(
+      id: '8',
+      title: 'Clock-in Missing',
+      message: 'You missed clock-in for 15th June. Please regularize.',
+      timestamp: DateTime.now().subtract(const Duration(days: 2)),
+      isRead: false,
+      category: NotificationCategory.attendance,
+      route: '/attendance',
+    ),
+    AppNotification(
+      id: '9',
+      title: 'Salary Revision',
+      message: 'Your salary has been revised effective from July.',
+      timestamp: DateTime.now().subtract(const Duration(days: 10)),
+      isRead: true,
+      category: NotificationCategory.payroll,
+      route: '/pay-summary',
+    ),
+    AppNotification(
+      id: '10',
+      title: 'Expense Approved',
+      message: 'Your travel expense claim (TX-992) has been approved.',
+      timestamp: DateTime.now().subtract(const Duration(hours: 12)),
+      isRead: false,
+      category: NotificationCategory.request,
+      route: '/reimbursement',
+    ),
   ];
 
   final List<MedicalClaim> _claims = [

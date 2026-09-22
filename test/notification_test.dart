@@ -31,10 +31,8 @@ void main() {
     testWidgets('Dashboard displays unread notification badge', (WidgetTester tester) async {
       await login(tester);
       
-      // In mock data, there are 4 unread notifications initially (id 1, 2, 4 are unread, 3, 5, 6 are read/unread mixed)
-      // Actually: id 1 (unread), id 2 (unread), id 3 (read), id 4 (unread), id 5 (read), id 6 (read)
-      // Total unread: 3
-      expect(find.text('3'), findsOneWidget); // The badge label
+      // Total unread: 6
+      expect(find.text('6'), findsOneWidget); // The badge label
     });
 
     testWidgets('Notifications screen loads and displays items with categories', (WidgetTester tester) async {
@@ -42,11 +40,11 @@ void main() {
       await tester.tap(find.byIcon(Icons.notifications_outlined));
       await tester.pumpAndSettle();
       
-      expect(find.text('Notifications'), findsWidgets);
+      expect(find.textContaining('Notifications'), findsWidgets);
       expect(find.text('Leave Approved'), findsOneWidget);
-      expect(find.text('Leave'), findsWidgets); 
+      expect(find.textContaining('Leave'), findsWidgets); 
       expect(find.text('Attendance Reminder'), findsOneWidget);
-      expect(find.text('Attendance'), findsWidgets);
+      expect(find.textContaining('Attendance'), findsWidgets);
     });
 
     testWidgets('Filtering by Unread works', (WidgetTester tester) async {
@@ -59,7 +57,7 @@ void main() {
       expect(find.text('Holiday Reminder'), findsOneWidget); // Read
 
       // Tap "Unread" filter
-      await tester.tap(find.text('Unread'));
+      await tester.tap(find.textContaining('Unread'));
       await tester.pumpAndSettle();
       
       expect(find.text('Leave Approved'), findsOneWidget);
@@ -69,8 +67,8 @@ void main() {
     testWidgets('Mark as Read updates UI and Dashboard count immediately', (WidgetTester tester) async {
       await login(tester);
       
-      // 1. Initial count is 3
-      expect(find.text('3'), findsOneWidget);
+      // 1. Initial count is 6
+      expect(find.text('6'), findsOneWidget);
 
       // 2. Open notifications
       await tester.tap(find.byIcon(Icons.notifications_outlined));
@@ -91,9 +89,9 @@ void main() {
       await tester.pageBack();
       await tester.pumpAndSettle();
 
-      // 7. Verify count decreased to 2
-      expect(find.text('2'), findsOneWidget);
-      expect(find.text('3'), findsNothing);
+      // 7. Verify count decreased to 5
+      expect(find.text('5'), findsOneWidget);
+      expect(find.text('6'), findsNothing);
     });
 
     testWidgets('Mark all as read works', (WidgetTester tester) async {
@@ -105,7 +103,7 @@ void main() {
       await tester.pumpAndSettle();
       
       // All should be read now. Filter by "Unread" should show empty state
-      await tester.tap(find.text('Unread'));
+      await tester.tap(find.textContaining('Unread'));
       await tester.pumpAndSettle();
       
       expect(find.text('No Notifications'), findsOneWidget);

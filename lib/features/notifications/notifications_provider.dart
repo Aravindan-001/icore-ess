@@ -35,7 +35,8 @@ enum NotificationViewFilter {
   attendance, 
   payroll, 
   request, 
-  system 
+  system,
+  general
 }
 
 final notificationFilterProvider = StateProvider<NotificationViewFilter>((ref) => NotificationViewFilter.all);

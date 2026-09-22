@@ -18,7 +18,25 @@ class NotificationsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppTheme.surfaceContainer,
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Notifications'),
+            Consumer(
+              builder: (context, ref, child) {
+                final unreadCount = ref.watch(unreadNotificationCountProvider);
+                return Text(
+                  unreadCount > 0 ? '$unreadCount unread' : 'All caught up',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.textMuted,
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
         centerTitle: true,
         actions: [
           IconButton(
@@ -44,6 +62,12 @@ class NotificationsScreen extends ConsumerWidget {
   }
 
   Widget _buildFilterBar(WidgetRef ref, NotificationViewFilter currentFilter) {
+    final notificationsAsync = ref.watch(notificationsProvider);
+    final allNotifications = notificationsAsync.maybeWhen(
+      data: (list) => list,
+      orElse: () => <AppNotification>[],
+    );
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: const BoxDecoration(
@@ -56,10 +80,20 @@ class NotificationsScreen extends ConsumerWidget {
         child: Row(
           children: NotificationViewFilter.values.map((filter) {
             final isSelected = currentFilter == filter;
+            
+            int count = 0;
+            if (filter == NotificationViewFilter.all) {
+              count = allNotifications.length;
+            } else if (filter == NotificationViewFilter.unread) {
+              count = allNotifications.where((n) => !n.isRead).length;
+            } else {
+              count = allNotifications.where((n) => n.category.name == filter.name).length;
+            }
+
             return Padding(
               padding: const EdgeInsets.only(right: 8),
               child: FilterChip(
-                label: Text(_capitalize(filter.name)),
+                label: Text('${_capitalize(filter.name)} ($count)'),
                 selected: isSelected,
                 onSelected: (_) => ref.read(notificationFilterProvider.notifier).state = filter,
                 backgroundColor: Colors.white,
@@ -112,107 +146,111 @@ class NotificationsScreen extends ConsumerWidget {
           final categoryColor = _getCategoryColor(item.category);
           final categoryIcon = _getCategoryIcon(item.category);
 
-          return Card(
-            margin: EdgeInsets.zero,
-            elevation: item.isRead ? 0 : 2,
-            color: item.isRead ? Colors.white : const Color(0xFFF0F7FF),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(
-                color: item.isRead ? AppTheme.outline.withValues(alpha: 0.5) : AppTheme.primaryBlue.withValues(alpha: 0.2),
-                width: 1,
+          return Semantics(
+            container: true,
+            label: '${item.isRead ? "Read" : "Unread"} notification: ${item.title}. ${item.message}. Category: ${item.category.name}.',
+            child: Card(
+              margin: EdgeInsets.zero,
+              elevation: item.isRead ? 0 : 2,
+              color: item.isRead ? Colors.white : const Color(0xFFF0F7FF),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                  color: item.isRead ? AppTheme.outline.withValues(alpha: 0.5) : AppTheme.primaryBlue.withValues(alpha: 0.2),
+                  width: 1,
+                ),
               ),
-            ),
-            child: InkWell(
-              onTap: () {
-                ref.read(analyticsServiceProvider).logEvent('notification_opened');
-                if (!item.isRead) {
-                  ref.read(notificationsProvider.notifier).markAsRead(item.id);
-                }
-                if (item.route != null) {
-                  Navigator.pushNamed(context, item.route!);
-                }
-              },
-              borderRadius: BorderRadius.circular(16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: item.isRead ? AppTheme.surfaceContainer : categoryColor.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
+              child: InkWell(
+                onTap: () {
+                  ref.read(analyticsServiceProvider).logEvent('notification_opened');
+                  if (!item.isRead) {
+                    ref.read(notificationsProvider.notifier).markAsRead(item.id);
+                  }
+                  if (item.route != null) {
+                    Navigator.pushNamed(context, item.route!);
+                  }
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: item.isRead ? AppTheme.surfaceContainer : categoryColor.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          categoryIcon,
+                          color: item.isRead ? AppTheme.textMuted : categoryColor,
+                          size: 20,
+                        ),
                       ),
-                      child: Icon(
-                        categoryIcon,
-                        color: item.isRead ? AppTheme.textMuted : categoryColor,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  item.title,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: !item.isRead ? FontWeight.bold : FontWeight.w600,
-                                    color: AppTheme.textMain,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    item.title,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: !item.isRead ? FontWeight.bold : FontWeight.w600,
+                                      color: AppTheme.textMain,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              if (!item.isRead)
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: AppTheme.primaryBlue,
-                                    shape: BoxShape.circle,
+                                if (!item.isRead)
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
+                                      color: AppTheme.primaryBlue,
+                                      shape: BoxShape.circle,
+                                    ),
                                   ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            item.message,
-                            style: TextStyle(
-                              fontSize: 13, 
-                              color: item.isRead ? AppTheme.textMuted : AppTheme.textMain.withValues(alpha: 0.8),
+                              ],
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.surfaceContainer,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  _capitalize(item.category.name),
-                                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
-                                ),
+                            const SizedBox(height: 4),
+                            Text(
+                              item.message,
+                              style: TextStyle(
+                                fontSize: 13, 
+                                color: item.isRead ? AppTheme.textMuted : AppTheme.textMain.withValues(alpha: 0.8),
                               ),
-                              Text(
-                                _formatTimestamp(item.timestamp),
-                                style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
-                              ),
-                            ],
-                          ),
-                        ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.surfaceContainer,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    _capitalize(item.category.name),
+                                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.textMuted),
+                                  ),
+                                ),
+                                Text(
+                                  _formatTimestamp(item.timestamp),
+                                  style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
