@@ -126,6 +126,65 @@ class DashboardScreen extends ConsumerWidget {
 
                 // Employee Primary Information Card
                 _buildEmployeeCard(data.employee, data.latestPayslip),
+                const SizedBox(height: 16),
+
+                // Pending Requests Summary Section
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppConstants.requestsRoute);
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  child: Card(
+                    color: Colors.white,
+                    elevation: 0,
+                    margin: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.warning.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.assignment_outlined, color: AppTheme.warning),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Pending Requests',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.textMain,
+                                  ),
+                                ),
+                                Text(
+                                  data.pendingRequests.isEmpty
+                                      ? 'No pending workflow items'
+                                      : 'You have ${data.pendingRequests.length} pending requests awaiting approval',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppTheme.textMuted,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textMuted),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 24),
 
                 // Quick Actions Grid Title

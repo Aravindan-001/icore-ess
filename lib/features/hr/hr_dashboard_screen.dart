@@ -89,7 +89,14 @@ class HrDashboardScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            _buildStatCard('Pending Leave Requests', '8', Icons.pending_actions, Colors.orange, isFullWidth: true),
+            _buildStatCard(
+              'Pending Leave Requests', 
+              '2', 
+              Icons.pending_actions, 
+              Colors.orange, 
+              isFullWidth: true,
+              onTap: () => Navigator.pushNamed(context, '/hr/leaves'),
+            ),
             
             const SizedBox(height: 24),
             const Text(
@@ -138,7 +145,7 @@ class HrDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon, Color color, {bool isFullWidth = false}) {
+  Widget _buildStatCard(String label, String value, IconData icon, Color color, {bool isFullWidth = false, VoidCallback? onTap}) {
     return Card(
       color: Colors.white,
       elevation: 0,
@@ -147,27 +154,31 @@ class HrDashboardScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(color: Colors.grey.shade200),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 24),
               ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
-                Text(label, style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.w500)),
-              ],
-            ),
-          ],
+              const SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+                  Text(label, style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.w500)),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
