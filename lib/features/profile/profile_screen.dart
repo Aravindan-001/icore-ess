@@ -25,6 +25,7 @@ class ProfileScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
+            tooltip: 'Settings',
             onPressed: () =>
                 Navigator.pushNamed(context, AppConstants.settingsRoute),
           ),
@@ -32,7 +33,37 @@ class ProfileScreen extends ConsumerWidget {
       ),
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (err, stack) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 48, color: AppTheme.error),
+                const SizedBox(height: 16),
+                const Text(
+                  'Unable to load employee profile',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textMain,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () => ref.refresh(employeeProfileProvider),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Retry'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryBlue,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         data: (profile) => SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -51,11 +82,11 @@ class ProfileScreen extends ConsumerWidget {
                   child: Row(
                     children: [
                       const CircleAvatar(
-                        radius: 40,
+                        radius: 36,
                         backgroundColor: Color(0xFFE2E8F0),
                         child: Icon(
                           Icons.person,
-                          size: 44,
+                          size: 40,
                           color: AppTheme.primaryBlue,
                         ),
                       ),
@@ -67,7 +98,7 @@ class ProfileScreen extends ConsumerWidget {
                             Text(
                               profile.name,
                               style: const TextStyle(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: AppTheme.textMain,
                               ),
@@ -165,6 +196,25 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 child: Column(
                   children: [
+                    ListTile(
+                      leading: const Icon(
+                        Icons.person_outline,
+                        color: AppTheme.primaryBlue,
+                      ),
+                      title: const Text(
+                        'Personal Information',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                      ),
+                      trailing: const Icon(Icons.chevron_right, size: 20),
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        AppConstants.personalInfoLandingRoute,
+                      ),
+                    ),
+                    const Divider(height: 1),
                     ListTile(
                       leading: const Icon(
                         Icons.folder_shared_outlined,

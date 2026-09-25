@@ -41,6 +41,12 @@ class AppConstants {
   static const String attendanceRoute = '/attendance';
   static const String documentsRoute = '/documents';
 
+  // HR Routes
+  static const String hrDashboardRoute = '/hr/dashboard';
+  static const String hrEmployeesRoute = '/hr/employees';
+  static const String hrLeavesRoute = '/hr/leaves';
+  static const String hrPayslipsRoute = '/hr/payslips';
+
   // Office Location Constants
   static const double officeLatitude = 13.0827;
   static const double officeLongitude = 80.2707;

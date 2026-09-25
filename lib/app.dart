@@ -93,10 +93,10 @@ class ICoreEssApp extends ConsumerWidget {
         AppConstants.certificatesRoute: (context) => const CertificatesScreen(),
         AppConstants.profileRequestsRoute: (context) => const ProfileRequestsScreen(),
         // HR Specific Routes
-        '/hr/dashboard': (context) => const HrDashboardScreen(),
-        '/hr/employees': (context) => const HrEmployeeListScreen(),
-        '/hr/leaves': (context) => const HrLeaveRequestsScreen(),
-        '/hr/payslips': (context) => const HrPayslipMgmtScreen(),
+        AppConstants.hrDashboardRoute: (context) => const HrDashboardScreen(),
+        AppConstants.hrEmployeesRoute: (context) => const HrEmployeeListScreen(),
+        AppConstants.hrLeavesRoute: (context) => const HrLeaveRequestsScreen(),
+        AppConstants.hrPayslipsRoute: (context) => const HrPayslipMgmtScreen(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == AppConstants.payslipDetailRoute) {

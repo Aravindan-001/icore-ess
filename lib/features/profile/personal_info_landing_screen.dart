@@ -15,6 +15,8 @@ class PersonalInformationLandingScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Personal Information'),
+        backgroundColor: AppTheme.primaryBlue,
+        foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -22,7 +24,37 @@ class PersonalInformationLandingScreen extends ConsumerWidget {
       ),
       body: employeeAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => const Center(child: Text('Error loading profile')),
+        error: (err, stack) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 48, color: AppTheme.error),
+                const SizedBox(height: 16),
+                const Text(
+                  'Unable to load personal information',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textMain,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () => ref.refresh(employeeProfileProvider),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Retry'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryBlue,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         data: (employee) => SingleChildScrollView(
           child: Column(
             children: [
@@ -113,23 +145,23 @@ class PersonalInformationLandingScreen extends ConsumerWidget {
       child: Row(
         children: [
           CircleAvatar(
-            radius: 40,
+            radius: 36,
             backgroundColor: AppTheme.primaryBlue.withValues(alpha: 0.1),
             backgroundImage: employee.profileImageUrl.isNotEmpty
                 ? NetworkImage(employee.profileImageUrl)
                 : null,
             child: employee.profileImageUrl.isEmpty
-                ? const Icon(Icons.person, size: 40, color: AppTheme.primaryBlue)
+                ? const Icon(Icons.person, size: 36, color: AppTheme.primaryBlue)
                 : null,
           ),
-          const SizedBox(width: 20),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   employee.name,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                 ),
@@ -148,7 +180,7 @@ class PersonalInformationLandingScreen extends ConsumerWidget {
                       ),
                 ),
                 Text(
-                  '${employee.department} • Location',
+                  '${employee.department} • DUBAI',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: AppTheme.textMuted,
                       ),

@@ -11,12 +11,45 @@ class BasicInformationScreen extends ConsumerWidget {
     final personalInfoAsync = ref.watch(personalInfoProvider);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: const Text('Basic Information'),
+        backgroundColor: AppTheme.primaryBlue,
+        foregroundColor: Colors.white,
       ),
       body: personalInfoAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => const Center(child: Text('Error loading information')),
+        error: (err, stack) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 48, color: AppTheme.error),
+                const SizedBox(height: 16),
+                const Text(
+                  'Unable to load basic information',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textMain,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () => ref.refresh(personalInfoProvider),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Retry'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryBlue,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         data: (info) => SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
