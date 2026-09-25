@@ -516,16 +516,65 @@ class MockEssRepository implements EssRepository {
   @override
   Future<PaySummary> getPaySummary() async {
     await Future.delayed(const Duration(milliseconds: 10));
+    final defaultEarnings = [
+      SalaryComponent(name: 'Basic Salary', amount: 975.00),
+      SalaryComponent(name: 'Housing Allowance', amount: 300.00),
+      SalaryComponent(name: 'Transportation Allowance', amount: 150.00),
+      SalaryComponent(name: 'Other Allowance', amount: 75.00),
+    ];
+
     return PaySummary(
-      annualGrossPay: 780000,
-      totalDeductionsYtd: 60000,
-      netPayYtd: 720000,
+      annualGrossPay: 18000.00,
+      totalDeductionsYtd: 50.00,
+      netPayYtd: 17950.00,
       monthlyBreakdown: [
-        MonthlyPay(month: 'May', amount: 65000),
-        MonthlyPay(month: 'April', amount: 65000),
-        MonthlyPay(month: 'March', amount: 65000),
-        MonthlyPay(month: 'February', amount: 65000),
-        MonthlyPay(month: 'January', amount: 65000),
+        MonthlyPay(
+          month: 'January',
+          year: '2025',
+          amount: 1500.00,
+          grossPay: 1500.00,
+          totalDeductions: 0.00,
+          earnings: defaultEarnings,
+          deductions: [],
+        ),
+        MonthlyPay(
+          month: 'December',
+          year: '2024',
+          amount: 1500.00,
+          grossPay: 1500.00,
+          totalDeductions: 0.00,
+          earnings: defaultEarnings,
+          deductions: [],
+        ),
+        MonthlyPay(
+          month: 'November',
+          year: '2024',
+          amount: 1450.00,
+          grossPay: 1500.00,
+          totalDeductions: 50.00,
+          earnings: defaultEarnings,
+          deductions: [
+            SalaryComponent(name: 'Unpaid Leave / LOP', amount: 50.00),
+          ],
+        ),
+        MonthlyPay(
+          month: 'October',
+          year: '2024',
+          amount: 1500.00,
+          grossPay: 1500.00,
+          totalDeductions: 0.00,
+          earnings: defaultEarnings,
+          deductions: [],
+        ),
+        MonthlyPay(
+          month: 'September',
+          year: '2024',
+          amount: 1500.00,
+          grossPay: 1500.00,
+          totalDeductions: 0.00,
+          earnings: defaultEarnings,
+          deductions: [],
+        ),
       ],
     );
   }

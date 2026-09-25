@@ -278,7 +278,7 @@ class MockDataService {
   static final List<Payslip> mockPayslips = [
     Payslip(month: 'January', year: '2025', netSalary: 1500.00, currency: 'AED'),
     Payslip(month: 'December', year: '2024', netSalary: 1500.00, currency: 'AED'),
-    Payslip(month: 'November', year: '2024', netSalary: 1500.00, currency: 'AED'),
+    Payslip(month: 'November', year: '2024', netSalary: 1450.00, currency: 'AED'),
   ];
 
   static final List<OvertimeRequest> mockOvertimeRequests = [
@@ -313,6 +313,44 @@ class MockDataService {
   ];
 
   static PayslipDetail getMockPayslipDetail(String year, String month) {
+    final cleanMonth = month.trim();
+    final monthAbbrev = cleanMonth.length >= 3
+        ? cleanMonth.substring(0, 3).toUpperCase()
+        : cleanMonth.toUpperCase();
+
+    if (cleanMonth.toLowerCase() == 'november' || cleanMonth.toLowerCase() == 'nov') {
+      return PayslipDetail(
+        employeeId: '20140',
+        employeeName: 'ANITHA K',
+        department: 'RETAIL',
+        designation: 'EXECUTIVE-SALES-ELIFE',
+        location: 'DUBAI',
+        currency: 'AED',
+        payPeriod: '$monthAbbrev-$year',
+        payMode: 'Cash',
+        dateOfJoining: '01-Mar-2024',
+        bankName: 'Emirates NBD',
+        accountNumber: '1234567890',
+        workDays: 30,
+        paidLeave: 0.00,
+        otHours: 0,
+        lop: 1.00,
+        earnings: [
+          SalaryComponent(name: 'Basic Salary', amount: 975.00),
+          SalaryComponent(name: 'Housing Allowance', amount: 300.00),
+          SalaryComponent(name: 'Transportation Allowance', amount: 150.00),
+          SalaryComponent(name: 'Other Allowance', amount: 75.00),
+        ],
+        deductions: [
+          SalaryComponent(name: 'Unpaid Leave / LOP', amount: 50.00),
+        ],
+        totalEarnings: 1500.00,
+        totalDeductions: 50.00,
+        netPay: 1450.00,
+        documentUrl: 'mock_payslip_url',
+      );
+    }
+
     return PayslipDetail(
       employeeId: '20140',
       employeeName: 'ANITHA K',
@@ -320,9 +358,11 @@ class MockDataService {
       designation: 'EXECUTIVE-SALES-ELIFE',
       location: 'DUBAI',
       currency: 'AED',
-      payPeriod: '${month.substring(0, 3).toUpperCase()}-$year',
+      payPeriod: '$monthAbbrev-$year',
       payMode: 'Cash',
       dateOfJoining: '01-Mar-2024',
+      bankName: 'Emirates NBD',
+      accountNumber: '1234567890',
       workDays: 31,
       paidLeave: 0.00,
       otHours: 0,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_theme.dart';
 
 class DocumentsScreen extends StatelessWidget {
@@ -11,6 +12,8 @@ class DocumentsScreen extends StatelessWidget {
         'name': 'Payslip - January 2025',
         'type': 'Payslip',
         'date': '31-Jan-2025',
+        'year': '2025',
+        'month': 'January',
       },
       {
         'name': 'Employment Contract',
@@ -42,6 +45,8 @@ class DocumentsScreen extends StatelessWidget {
         separatorBuilder: (context, index) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           final doc = mockDocs[index];
+          final isPayslip = doc['type'] == 'Payslip';
+
           return Card(
             color: Colors.white,
             elevation: 0,
@@ -59,8 +64,8 @@ class DocumentsScreen extends StatelessWidget {
                       color: AppTheme.primaryBlue.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
-                      Icons.description,
+                    child: Icon(
+                      isPayslip ? Icons.receipt_long : Icons.description,
                       color: AppTheme.primaryBlue,
                       size: 28,
                     ),
@@ -80,7 +85,7 @@ class DocumentsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Type: ${doc['type']} Ã¢â‚¬Â¢ Uploaded: ${doc['date']}',
+                          'Type: ${doc['type']} • Uploaded: ${doc['date']}',
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppTheme.textMuted,
@@ -100,11 +105,19 @@ class DocumentsScreen extends StatelessWidget {
                         ),
                         tooltip: 'View Document',
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Viewing ${doc['name']}...'),
-                            ),
-                          );
+                          if (isPayslip && doc['year'] != null && doc['month'] != null) {
+                            Navigator.pushNamed(
+                              context,
+                              AppConstants.payslipDetailRoute,
+                              arguments: {'year': doc['year']!, 'month': doc['month']!},
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Viewing ${doc['name']}...'),
+                              ),
+                            );
+                          }
                         },
                       ),
                       IconButton(
@@ -115,13 +128,21 @@ class DocumentsScreen extends StatelessWidget {
                         ),
                         tooltip: 'Download Document',
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                '${doc['name']} downloaded successfully!',
+                          if (isPayslip && doc['year'] != null && doc['month'] != null) {
+                            Navigator.pushNamed(
+                              context,
+                              AppConstants.payslipDetailRoute,
+                              arguments: {'year': doc['year']!, 'month': doc['month']!},
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  '${doc['name']} downloaded successfully!',
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          }
                         },
                       ),
                     ],

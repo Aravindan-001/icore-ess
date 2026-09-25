@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../services/mock/mock_data_service.dart';
-import '../../models/employee.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/utils/pdf_generator.dart';
+import '../../models/employee.dart';
+import '../../services/mock/mock_data_service.dart';
 
 class HrPayslipMgmtScreen extends StatefulWidget {
   const HrPayslipMgmtScreen({super.key});
@@ -85,6 +86,7 @@ class _HrPayslipMgmtScreenState extends State<HrPayslipMgmtScreen> {
                         children: [
                           IconButton(
                             icon: const Icon(Icons.visibility_outlined, size: 20, color: AppTheme.primaryBlue),
+                            tooltip: 'View Details',
                             onPressed: () {
                               Navigator.pushNamed(
                                 context,
@@ -95,7 +97,24 @@ class _HrPayslipMgmtScreenState extends State<HrPayslipMgmtScreen> {
                           ),
                           IconButton(
                             icon: const Icon(Icons.download_outlined, size: 20, color: AppTheme.primaryBlue),
-                            onPressed: () {},
+                            tooltip: 'Download Payslip',
+                            onPressed: () async {
+                              try {
+                                final detail = MockDataService.getMockPayslipDetail(payslip.year, payslip.month);
+                                final file = await PdfGenerator.generatePayslipPdf(detail);
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Payslip downloaded: ${file.path}')),
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Failed to download payslip: $e')),
+                                  );
+                                }
+                              }
+                            },
                           ),
                         ],
                       ),

@@ -166,7 +166,12 @@ class PdfGenerator {
       ),
     );
 
-    final output = await getTemporaryDirectory();
+    Directory output;
+    try {
+      output = await getTemporaryDirectory();
+    } catch (_) {
+      output = Directory.systemTemp;
+    }
     final file = File("${output.path}/payslip_${detail.payPeriod}.pdf");
     await file.writeAsBytes(await pdf.save());
     return file;
