@@ -21,12 +21,12 @@ flowchart TD
     end
 
     subgraph Contracts ["REPOSITORY CONTRACTS"]
-        REPO["Abstract Data Interfaces (EssRepository)"]
+        REPO["Abstract Data Interfaces: EssRepository"]
     end
 
     subgraph DataSources ["DATA SOURCES"]
-        MOCK["Mock Data Source<br/>Deterministic Mock Repository<br/>(Active Default)"]
-        SOAP["SOAP-Ready Transport<br/>SoapClient, XmlUtils, SoapConfig<br/>(ESS_BACKEND=soap Prepared)"]
+        MOCK["Mock Data Source - Deterministic Mock Repository (Active Default)"]
+        SOAP["SOAP-Ready Transport - SoapClient, XmlUtils, SoapConfig (ESS_BACKEND=soap Prepared)"]
     end
 
     UI --> STATE
@@ -135,8 +135,8 @@ flowchart TD
     REQ_SVC --> ESS_REPO
     NOTIF_SVC --> ESS_REPO
 
-    ESS_REPO -->|ESS_BACKEND=mock| MOCK_REPO
-    ESS_REPO -->|ESS_BACKEND=soap| SOAP_REPO
+    ESS_REPO -->|Mock backend| MOCK_REPO
+    ESS_REPO -->|SOAP backend| SOAP_REPO
 
     SOAP_REPO --> SOAP_BACKEND
     AUTH_SVC -.->|Telemetry| FIREBASE
@@ -240,7 +240,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     subgraph AuthStep ["Authentication Flow"]
-        START([App Launch]) --> BOOT["Bootstrap Screen (restoreSession)"]
+        START([App Launch]) --> BOOT["Bootstrap Screen: restoreSession"]
         BOOT -->|Session Active| MAIN_NAV
         BOOT -->|No Session| LOGIN_SCR["Login Screen"]
         LOGIN_SCR -->|Authenticate Credentials| AUTH_VAL{Success?}
@@ -270,7 +270,7 @@ flowchart TD
     subgraph AttDetails ["Attendance Subflow"]
         ATT_MOD --> GPS_CHK["GPS Location & Accuracy Check"]
         GPS_CHK --> GEO_CHK{Within 50m & Accuracy <= 100m?}
-        GEO_CHK -->|No| ATT_ERR["Show Geofence / Accuracy Warning"]
+        GEO_CHK -->|No| ATT_ERR["Show Geofence or Accuracy Warning"]
         GEO_CHK -->|Yes| ATT_ACT{Action Status}
         ATT_ACT -->|Not Marked| CHECK_IN["Execute Check In"] --> LOG_ATT["Log analytics: attendance_marked"]
         ATT_ACT -->|Checked In| CHECK_OUT["Execute Check Out"] --> LOG_ATT
@@ -284,8 +284,8 @@ flowchart TD
 
     subgraph PayDetails ["Payroll Subflow"]
         PAY_MOD --> PAY_DET["Payslip Detail Screen"]
-        PAY_DET --> GEN_PDF["PdfGenerator.generatePayslipPdf()"]
-        GEN_PDF --> SHARE_PDF["Download / Share PDF via share_plus"]
+        PAY_DET --> GEN_PDF["PdfGenerator.generatePayslipPdf"]
+        GEN_PDF --> SHARE_PDF["Download or Share PDF via share_plus"]
     end
 
     subgraph NotifDetails ["Notifications Subflow"]
@@ -294,13 +294,13 @@ flowchart TD
     end
 
     subgraph ProfileDetails ["Profile Subflow"]
-        PROF_MOD --> LANDING["Personal Info Landing (10 Sub-sections)"]
+        PROF_MOD --> LANDING["Personal Info Landing - 10 Sub-sections"]
         LANDING --> SUB_SECTIONS["Basic, Family, Bank, Education, Skills, Identity, Work, Certs, Docs, Requests"]
     end
 
     subgraph LogoutStep ["Logout Flow"]
         PROF_MOD --> TAP_LOGOUT["Tap Logout Account"]
-        TAP_LOGOUT --> CLEAR_SESS["SessionManager.clearSession()"]
+        TAP_LOGOUT --> CLEAR_SESS["SessionManager.clearSession"]
         CLEAR_SESS --> LOGIN_SCR
     end
 ```
@@ -312,7 +312,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     subgraph HRAuth ["HR Authentication"]
-        H_START([App Launch]) --> H_LOGIN["Login Screen (Credentials: HR001)"]
+        H_START([App Launch]) --> H_LOGIN["Login Screen - Credentials HR001"]
         H_LOGIN --> H_VAL{Role Check}
         H_VAL -->|Role: hrAdmin| HR_DASH["HR Dashboard Screen"]
     end
@@ -361,7 +361,7 @@ flowchart TD
     end
 
     subgraph Service_Layer ["Service Layer"]
-        AUTH_SVC["AuthService.login(empId, pass, rememberMe)"]
+        AUTH_SVC["AuthService.login"]
     end
 
     subgraph Storage_Layer ["Secure Storage Layer (SessionManager)"]
@@ -391,8 +391,8 @@ flowchart TD
     SEC_STOR --> K_SESS
     SEC_STOR --> K_EMP
     SEC_STOR --> K_ROLE
-    SEC_STOR -->|If rememberMe=true| K_REM_FLAG
-    SEC_STOR -->|If rememberMe=true| K_REM_ID
+    SEC_STOR -->|When Remember Me enabled| K_REM_FLAG
+    SEC_STOR -->|When Remember Me enabled| K_REM_ID
 
     AUTH_SVC --> ROLE_CHK
     ROLE_CHK -->|Employee| EMP_NAV
@@ -412,16 +412,16 @@ The project utilizes **Riverpod** (`flutter_riverpod: ^2.6.1`) for unidirectiona
 
 ```mermaid
 flowchart TD
-    UI["UI Widget (ConsumerWidget)"]
+    UI["UI Widget - ConsumerWidget"]
     PROV["Riverpod Provider / StateNotifier / FutureProvider"]
-    SVC["Service Layer (AuthService, AttendanceService, etc.)"]
-    REPO["Repository Contract (EssRepository)"]
-    DS["Data Source (Mock / SOAP)"]
-    STATE["State Update (StateNotifier.state)"]
+    SVC["Service Layer - AuthService, AttendanceService, etc."]
+    REPO["Repository Contract - EssRepository"]
+    DS["Data Source - Mock / SOAP"]
+    STATE["State Update - StateNotifier.state"]
 
-    UI -->|ref.watch() / ref.listen()| PROV
+    UI -->|Riverpod binding| PROV
     PROV -->|Business Execution| SVC
-    SVC -->|Data Fetching / Action| REPO
+    SVC -->|Data Action| REPO
     REPO -->|Data Access| DS
     DS -->|Return Result| STATE
     STATE -->|Rebuild UI| UI
@@ -459,7 +459,7 @@ flowchart TD
     end
 
     subgraph Service_Layer ["Service Layer"]
-        SVC["Application Service (e.g. LeaveService)"]
+        SVC["Application Service - e.g. LeaveService"]
     end
 
     subgraph Repo_Contract ["Repository Contract Layer"]
@@ -467,19 +467,19 @@ flowchart TD
     end
 
     subgraph Env_Switch ["Environment Switching Logic"]
-        ENV_DEF["String.fromEnvironment('ESS_BACKEND', defaultValue: 'mock')"]
+        ENV_DEF["Environment Flag: ESS_BACKEND"]
     end
 
     subgraph Mock_Path ["Active Mock Path"]
         MOCK_REPO["MockEssRepository"]
-        MOCK_DATA["MockDataService (In-memory deterministic data)"]
+        MOCK_DATA["MockDataService - In-memory deterministic data"]
     end
 
     subgraph SOAP_Path ["Prepared SOAP/XML Path (SOAP Transport Prepared)"]
         SOAP_REPO["SoapEssRepository"]
         SOAP_CLIENT["SoapClient"]
         XML_UTILS["XmlUtils"]
-        SOAP_CFG["SoapConfig (dev / uat / prod endpoints)"]
+        SOAP_CFG["SoapConfig - dev / uat / prod endpoints"]
         CLIENT_SOAP["Client SOAP Backend Service"]
     end
 
@@ -487,14 +487,14 @@ flowchart TD
     SVC --> REPO_INT
     REPO_INT --> ENV_DEF
 
-    ENV_DEF -->|ESS_BACKEND=mock| MOCK_REPO
+    ENV_DEF -->|Mock backend| MOCK_REPO
     MOCK_REPO --> MOCK_DATA
 
-    ENV_DEF -->|ESS_BACKEND=soap| SOAP_REPO
+    ENV_DEF -->|SOAP backend| SOAP_REPO
     SOAP_REPO --> SOAP_CLIENT
     SOAP_CLIENT --> XML_UTILS
     SOAP_CLIENT --> SOAP_CFG
-    SOAP_CLIENT -.->|HTTPS / XML Envelope| CLIENT_SOAP
+    SOAP_CLIENT -.->|HTTPS XML Envelope| CLIENT_SOAP
 ```
 
 *Architectural Note on Backend Integration*:
@@ -509,26 +509,26 @@ The Attendance module integrates real device GPS location through `GeolocatorLoc
 ```mermaid
 flowchart TD
     subgraph AttendanceUI ["Attendance UI"]
-        BTN["Check In / Check Out Button"]
+        BTN["Check In or Check Out Button"]
     end
 
     subgraph Notifier ["AttendanceActionNotifier (Riverpod)"]
-        NOTIFIER_ACT["checkIn() / checkOut()"]
-        LOG_ANALYTICS["AnalyticsService.logEvent('attendance_marked')"]
+        NOTIFIER_ACT["checkIn or checkOut action"]
+        LOG_ANALYTICS["AnalyticsService.logEvent: attendance_marked"]
         REFRESH["Invalidate todayAttendanceProvider & History"]
     end
 
     subgraph Service_Exec ["AttendanceService"]
-        FETCH_LOC["GeolocatorLocationService.getLocationDetails()"]
-        VALIDATE["GPS & Geofence Validation (Accuracy <= 100m, Distance <= 50m)"]
+        FETCH_LOC["GeolocatorLocationService.getLocationDetails"]
+        VALIDATE["GPS & Geofence Validation - Accuracy <= 100m, Distance <= 50m"]
     end
 
     subgraph Repository ["AttendanceRepository"]
-        EXEC_CHECK["checkIn() / checkOut() (Mock / SOAP)"]
+        EXEC_CHECK["checkIn or checkOut execution - Mock / SOAP"]
     end
 
     subgraph Firebase ["Firebase Analytics"]
-        FA["Firebase Analytics SDK ('attendance_marked')"]
+        FA["Firebase Analytics SDK: attendance_marked"]
     end
 
     BTN --> NOTIFIER_ACT
@@ -556,22 +556,22 @@ Firebase is configured in `lib/main.dart` using `firebase_core`, `firebase_analy
 ```mermaid
 flowchart TD
     subgraph Init ["Main App Initialization"]
-        MAIN_INIT["Firebase.initializeApp()"]
+        MAIN_INIT["Firebase.initializeApp"]
     end
 
     subgraph Crashlytics ["Firebase Crashlytics (Error Telemetry)"]
-        FATAL_ERR["FlutterError.onError -> recordFlutterFatalError"]
-        ASYNC_ERR["PlatformDispatcher.instance.onError -> recordError(fatal: true)"]
-        META["Custom Keys: app_version='1.0.0+1', environment='development'/'production'"]
+        FATAL_ERR["FlutterError.onError: recordFlutterFatalError"]
+        ASYNC_ERR["PlatformDispatcher.onError: recordError"]
+        META["Custom Keys: app_version and environment"]
     end
 
     subgraph Analytics ["Firebase Analytics (Business Telemetry)"]
         SVC_LAYER["AnalyticsService Abstraction"]
 
-        EV1["login_success (Logged upon successful authentication)"]
-        EV2["attendance_marked (Logged upon check-in and check-out)"]
-        EV3["request_submitted (Logged upon leave submission)"]
-        EV4["notification_opened (Logged upon tapping a notification item)"]
+        EV1["login_success: Logged upon successful authentication"]
+        EV2["attendance_marked: Logged upon check-in and check-out"]
+        EV3["request_submitted: Logged upon leave submission"]
+        EV4["notification_opened: Logged upon tapping a notification item"]
     end
 
     MAIN_INIT --> Crashlytics
@@ -599,11 +599,11 @@ flowchart TD
     subgraph UI_View ["Payslip UI Pipeline"]
         LIST_SCR["Payslip History Screen (payslipsProvider)"]
         DET_SCR["Payslip Detail Screen (payslipDetailProvider)"]
-        VERIFY["Arithmetic Check: Net Pay == Total Earnings - Total Deductions"]
+        VERIFY["Arithmetic Check: Net Pay = Total Earnings - Total Deductions"]
     end
 
     subgraph PDF_Engine ["PDF Generation Engine (PdfGenerator)"]
-        BUILD_DOC["pw.Document() (A4 Page Format)"]
+        BUILD_DOC["pw.Document - A4 Page Format"]
         HEADER["Header Table: Employee Info, Dept, Designation, Pay Period"]
         WORK_BREAK["Work Days, Paid Leave, OT Hours, LOP Breakdown"]
         EARN_DED["Dual-Column Table: Earnings vs Deductions"]
@@ -611,14 +611,14 @@ flowchart TD
     end
 
     subgraph File_Sharing ["File Handling & Sharing"]
-        PATH_PROV["path_provider: getTemporaryDirectory()"]
+        PATH_PROV["path_provider: getTemporaryDirectory"]
         WRITE_FILE["Write payslip_YEAR_MONTH.pdf"]
-        SHARE_PLUS["share_plus: Share.shareXFiles() / Download"]
+        SHARE_PLUS["share_plus: Share.shareXFiles or Download"]
     end
 
-    LIST_SCR -->|Select Year/Month| DET_SCR
+    LIST_SCR -->|Select period| DET_SCR
     DET_SCR --> VERIFY
-    DET_SCR -->|Tap Download/Share PDF| BUILD_DOC
+    DET_SCR -->|Tap Download or Share PDF| BUILD_DOC
 
     BUILD_DOC --> HEADER
     HEADER --> WORK_BREAK
@@ -637,13 +637,13 @@ flowchart TD
 ```mermaid
 flowchart TD
     subgraph Data_Layer ["Notification Repository & Service"]
-        REPO["NotificationRepository.getNotifications()"]
+        REPO["NotificationRepository.getNotifications"]
         SVC["NotificationService"]
     end
 
     subgraph Providers ["Riverpod State Layer"]
         NOTIF_PROV["notificationsProvider"]
-        UNREAD_COUNT["unreadNotificationCountProvider (Computes badge count)"]
+        UNREAD_COUNT["unreadNotificationCountProvider - Computes badge count"]
     end
 
     subgraph UI_Layer ["Notifications Screen"]
@@ -655,8 +655,8 @@ flowchart TD
 
     subgraph Navigation ["Deep Link Navigation & Telemetry"]
         TAP_ITEM["Tap Notification Item"]
-        LOG_EVENT["logEvent('notification_opened')"]
-        NAV_ROUTE["Navigate to target route (e.g. /leave, /payslip)"]
+        LOG_EVENT["logEvent: notification_opened"]
+        NAV_ROUTE["Navigate to target route - e.g. leave or payslip"]
     end
 
     REPO --> SVC
@@ -692,7 +692,7 @@ flowchart TD
     end
 
     subgraph Service ["RequestsService Aggregator"]
-        AGG["RequestsService.getAllRequests() (Future.wait concurrent fetch)"]
+        AGG["RequestsService.getAllRequests - Concurrent fetch"]
         SORT["Sort descending by submittedDate"]
         UNIFY["Map domain models -> UnifiedRequest model"]
     end
@@ -829,7 +829,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     subgraph UserLayer ["User Actions"]
-        USER_ACTION["User Gesture (Tap Check In, Apply Leave, View Payslip)"]
+        USER_ACTION["User Gesture - Tap Check In, Apply Leave, View Payslip"]
     end
 
     subgraph UILayer ["Flutter Presentation Layer"]
@@ -841,7 +841,7 @@ flowchart TD
     end
 
     subgraph ServiceLayer ["Business Service Layer"]
-        SERVICE["Service (Validation, Geofence, Calculations)"]
+        SERVICE["Service - Validation, Geofence, Calculations"]
     end
 
     subgraph ContractLayer ["Repository Interface Layer"]
@@ -855,16 +855,16 @@ flowchart TD
 
     subgraph TelemetryLayer ["Telemetry & External Output"]
         TELEMETRY["Firebase Analytics / Crashlytics"]
-        PDF_OUTPUT["PdfGenerator -> Local Storage / Share"]
+        PDF_OUTPUT["PdfGenerator: Local Storage / Share"]
     end
 
     USER_ACTION --> WIDGET
-    WIDGET -->|ref.read() / ref.watch()| NOTIFIER
+    WIDGET -->|Riverpod access| NOTIFIER
     NOTIFIER --> SERVICE
     SERVICE --> CONTRACT
 
-    CONTRACT -->|ESS_BACKEND=mock| MOCK_IMPL
-    CONTRACT -->|ESS_BACKEND=soap| SOAP_IMPL
+    CONTRACT -->|Mock backend| MOCK_IMPL
+    CONTRACT -->|SOAP backend| SOAP_IMPL
 
     MOCK_IMPL -->|Return Model Data| SERVICE
     SOAP_IMPL -.->|Awaiting SOAP Contract| SERVICE
