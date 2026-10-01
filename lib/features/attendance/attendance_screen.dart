@@ -60,7 +60,6 @@ class AttendanceScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(next.successMessage!), backgroundColor: AppTheme.success),
         );
-        ref.read(analyticsServiceProvider).logEvent('attendance_marked');
         ref.read(attendanceActionProvider.notifier).clearStatus();
       } else if (next.error != null) {
         ScaffoldMessenger.of(context).removeCurrentSnackBar();

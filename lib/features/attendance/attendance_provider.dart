@@ -50,6 +50,7 @@ class AttendanceActionNotifier extends StateNotifier<AttendanceActionState> {
       final success = await service.checkIn();
       if (success) {
         state = AttendanceActionState.success('Checked in successfully!');
+        _ref.read(analyticsServiceProvider).logEvent('attendance_marked');
         _ref.invalidate(todayAttendanceProvider);
         _ref.invalidate(attendanceLocationProvider);
         _ref.invalidate(attendanceHistoryProvider);
@@ -68,6 +69,7 @@ class AttendanceActionNotifier extends StateNotifier<AttendanceActionState> {
       final success = await service.checkOut();
       if (success) {
         state = AttendanceActionState.success('Checked out successfully!');
+        _ref.read(analyticsServiceProvider).logEvent('attendance_marked');
         _ref.invalidate(todayAttendanceProvider);
         _ref.invalidate(attendanceLocationProvider);
         _ref.invalidate(attendanceHistoryProvider);
