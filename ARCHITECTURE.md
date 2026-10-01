@@ -6,33 +6,34 @@ The **ESS Application** is an Employee Self-Service (ESS) mobile application bui
 
 The application strictly follows a **Clean Layered Architecture** pattern, enforcing clear separation of concerns across presentation, state management, business services, repository abstractions, and data providers:
 
-```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                           PRESENTATION LAYER                            â”‚
-â”‚           Flutter Material 3 UI Widgets, ConsumerWidgets, Screens       â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                                     â”‚
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                         STATE MANAGEMENT LAYER                          â”‚
-â”‚             Riverpod StateNotifiers, Providers, FutureProviders         â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                                     â”‚
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                             SERVICE LAYER                               â”‚
-â”‚       Business Rules, Geofence Validation, Request Aggregation          â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                                     â”‚
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                          REPOSITORY CONTRACTS                           â”‚
-â”‚                 Abstract Data Interfaces (EssRepository)                â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                   â”‚                                  â”‚
-                   â–¼                                  â–¼
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚       MOCK DATA SOURCE             â”‚  â”‚       SOAP-READY TRANSPORT      â”‚
-â”‚  Deterministic Mock Repository     â”‚  â”‚  SoapClient, XmlUtils, SoapConfigâ”‚
-â”‚        (Active Default)            â”‚  â”‚   (ESS_BACKEND=soap Prepared)   â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+```mermaid
+flowchart TD
+    subgraph Presentation ["PRESENTATION LAYER"]
+        UI["Flutter Material 3 UI Widgets, ConsumerWidgets, Screens"]
+    end
+
+    subgraph StateManagement ["STATE MANAGEMENT LAYER"]
+        STATE["Riverpod StateNotifiers, Providers, FutureProviders"]
+    end
+
+    subgraph Service ["SERVICE LAYER"]
+        SVC["Business Rules, Geofence Validation, Request Aggregation"]
+    end
+
+    subgraph Contracts ["REPOSITORY CONTRACTS"]
+        REPO["Abstract Data Interfaces (EssRepository)"]
+    end
+
+    subgraph DataSources ["DATA SOURCES"]
+        MOCK["Mock Data Source<br/>Deterministic Mock Repository<br/>(Active Default)"]
+        SOAP["SOAP-Ready Transport<br/>SoapClient, XmlUtils, SoapConfig<br/>(ESS_BACKEND=soap Prepared)"]
+    end
+
+    UI --> STATE
+    STATE --> SVC
+    SVC --> REPO
+    REPO --> MOCK
+    REPO --> SOAP
 ```
 
 Key Architectural Principles:
@@ -409,32 +410,21 @@ flowchart TD
 
 The project utilizes **Riverpod** (`flutter_riverpod: ^2.6.1`) for unidirectional data flow:
 
-```
-UI Widget (ConsumerWidget / ConsumerStatefulWidget)
-    â”‚
-    â”œâ”€â–º ref.watch() / ref.listen()
-    â”‚
-    â–¼
-Riverpod Provider / StateNotifier / FutureProvider
-    â”‚
-    â”œâ”€â–º Business Execution
-    â”‚
-    â–¼
-Service Layer (AuthService, AttendanceService, etc.)
-    â”‚
-    â”œâ”€â–º Data Fetching / Action
-    â”‚
-    â–¼
-Repository Contract (EssRepository)
-    â”‚
-    â–¼
-Data Source (Mock / SOAP)
-    â”‚
-    â–¼
-State Update (StateNotifier.state = new)
-    â”‚
-    â–¼
-UI Rebuild (Declarative UI Update)
+```mermaid
+flowchart TD
+    UI["UI Widget (ConsumerWidget)"]
+    PROV["Riverpod Provider / StateNotifier / FutureProvider"]
+    SVC["Service Layer (AuthService, AttendanceService, etc.)"]
+    REPO["Repository Contract (EssRepository)"]
+    DS["Data Source (Mock / SOAP)"]
+    STATE["State Update (StateNotifier.state)"]
+
+    UI -->|ref.watch() / ref.listen()| PROV
+    PROV -->|Business Execution| SVC
+    SVC -->|Data Fetching / Action| REPO
+    REPO -->|Data Access| DS
+    DS -->|Return Result| STATE
+    STATE -->|Rebuild UI| UI
 ```
 
 ### Primary Application Providers
@@ -554,7 +544,7 @@ flowchart TD
 - **Office Coordinates**: Configured in application constants
 - **Allowed Radius**: `50.0` meters
 - **Maximum Allowed Accuracy Threshold**: `100.0` meters
-- **Sequential Attendance States**: `notMarked` â†’ `checkedIn` â†’ `completed`
+- **Sequential Attendance States**: `notMarked` -> `checkedIn` -> `completed`
 - **Telemetry**: Successful check-in/out execution in `AttendanceActionNotifier` triggers `analyticsServiceProvider.logEvent('attendance_marked')`.
 
 ---
@@ -736,21 +726,21 @@ The Profile module provides comprehensive employee information through a main la
 
 ```
 ProfileScreen (/profile)
-    â”‚
-    â”œâ”€â”€ PersonalInformationLandingScreen (/profile/personal-info)
-    â”‚     â”œâ”€â”€ 1. Basic Information (/profile/basic-info)
-    â”‚     â”œâ”€â”€ 2. Family Information (/profile/family)
-    â”‚     â”œâ”€â”€ 3. Bank Information (/profile/bank)
-    â”‚     â”œâ”€â”€ 4. Education History (/profile/education)
-    â”‚     â”œâ”€â”€ 5. Education Documents (/profile/education-docs)
-    â”‚     â”œâ”€â”€ 6. Skills (/profile/skills)
-    â”‚     â”œâ”€â”€ 7. Identity Documents (/profile/identity)
-    â”‚     â”œâ”€â”€ 8. Work History (/profile/work-history)
-    â”‚     â”œâ”€â”€ 9. Certificates (/profile/certificates)
-    â”‚     â””â”€â”€ 10. Profile Update Requests (/profile/requests)
-    â”‚
-    â””â”€â”€ DocumentsScreen (/documents)
-          â””â”€â”€ Direct Payslip PDF Navigation -> (/payslip/detail)
+|
++-- PersonalInformationLandingScreen (/profile/personal-info)
+|     +-- 1. Basic Information (/profile/basic-info)
+|     +-- 2. Family Information (/profile/family)
+|     +-- 3. Bank Information (/profile/bank)
+|     +-- 4. Education History (/profile/education)
+|     +-- 5. Education Documents (/profile/education-docs)
+|     +-- 6. Skills (/profile/skills)
+|     +-- 7. Identity Documents (/profile/identity)
+|     +-- 8. Work History (/profile/work-history)
+|     +-- 9. Certificates (/profile/certificates)
+|     +-- 10. Profile Update Requests (/profile/requests)
+|
++-- DocumentsScreen (/documents)
+      +-- Direct Payslip PDF Navigation -> (/payslip/detail)
 ```
 
 ---
@@ -761,33 +751,33 @@ The codebase contains 27 automated test files under `test/`, validating unit log
 
 ```
 test/
-â”œâ”€â”€ airfare_test.dart
-â”œâ”€â”€ attendance_permission_test.dart
-â”œâ”€â”€ attendance_service_test.dart
-â”œâ”€â”€ attendance_test.dart
-â”œâ”€â”€ auth_test.dart
-â”œâ”€â”€ claims_reimbursement_test.dart
-â”œâ”€â”€ complete_regression_test.dart
-â”œâ”€â”€ dashboard_test.dart
-â”œâ”€â”€ education_test.dart
-â”œâ”€â”€ expenses_test.dart
-â”œâ”€â”€ geofence_test.dart
-â”œâ”€â”€ leave_test.dart
-â”œâ”€â”€ navigation_test.dart
-â”œâ”€â”€ notification_test.dart
-â”œâ”€â”€ orders_test.dart
-â”œâ”€â”€ overtime_test.dart
-â”œâ”€â”€ payroll_test.dart
-â”œâ”€â”€ personal_info_module_test.dart
-â”œâ”€â”€ phase_9b_implementation_test.dart
-â”œâ”€â”€ profile_documents_test.dart
-â”œâ”€â”€ profile_settings_test.dart
-â”œâ”€â”€ reimbursement_module_test.dart
-â”œâ”€â”€ repository_test.dart
-â”œâ”€â”€ requests_test.dart
-â”œâ”€â”€ security_rules_test.dart
-â”œâ”€â”€ serialization_test.dart
-â””â”€â”€ soap_infrastructure_test.dart
+|-- airfare_test.dart
+|-- attendance_permission_test.dart
+|-- attendance_service_test.dart
+|-- attendance_test.dart
+|-- auth_test.dart
+|-- claims_reimbursement_test.dart
+|-- complete_regression_test.dart
+|-- dashboard_test.dart
+|-- education_test.dart
+|-- expenses_test.dart
+|-- geofence_test.dart
+|-- leave_test.dart
+|-- navigation_test.dart
+|-- notification_test.dart
+|-- orders_test.dart
+|-- overtime_test.dart
+|-- payroll_test.dart
+|-- personal_info_module_test.dart
+|-- phase_9b_implementation_test.dart
+|-- profile_documents_test.dart
+|-- profile_settings_test.dart
+|-- reimbursement_module_test.dart
+|-- repository_test.dart
+|-- requests_test.dart
+|-- security_rules_test.dart
+|-- serialization_test.dart
++-- soap_infrastructure_test.dart
 ```
 
 ### Verified Quality Assurance Status (from repository records)
