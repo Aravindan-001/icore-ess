@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../repositories/ess_repository.dart';
 import '../../repositories/auth_repository.dart';
@@ -52,16 +53,51 @@ final soapClientProvider = Provider<SoapClient>((ref) {
   return SoapClient(ref.watch(soapConfigProvider));
 });
 
-/// Core repository provider - toggles between Mock and SOAP
-/// Default is 'mock' as SOAP contract is pending.
-final essRepositoryProvider = Provider<EssRepository>((ref) {
-  const backend = String.fromEnvironment('ESS_BACKEND', defaultValue: 'mock');
-  
+/// Pure selection logic for EssRepository, supporting testability for mode switching.
+EssRepository selectEssRepository({
+  required String backend,
+  required bool isRelease,
+  required Ref ref,
+}) {
   if (backend == 'soap') {
     return SoapEssRepository(ref.watch(soapClientProvider));
   }
 
+  if (backend == 'mock') {
+    if (isRelease) {
+      throw StateError(
+        'SECURITY ERROR: Mock backend (ESS_BACKEND=mock) is strictly prohibited in release builds.',
+      );
+    }
+    return MockEssRepository();
+  }
+
+  if (backend.isNotEmpty) {
+    throw StateError(
+      'CONFIGURATION ERROR: Unsupported backend "$backend". Supported values are "mock" and "soap".',
+    );
+  }
+
+  // ESS_BACKEND is missing/empty
+  if (isRelease) {
+    throw StateError(
+      'SECURITY ERROR: ESS_BACKEND configuration is missing in release build. Production builds must explicitly configure ESS_BACKEND=soap.',
+    );
+  }
+
+  // Development/Test fallback when ESS_BACKEND is not specified
   return MockEssRepository();
+}
+
+/// Core repository provider - toggles between Mock and SOAP.
+/// Fails closed in release/production builds if ESS_BACKEND is missing or not set to 'soap'.
+final essRepositoryProvider = Provider<EssRepository>((ref) {
+  const backend = String.fromEnvironment('ESS_BACKEND');
+  return selectEssRepository(
+    backend: backend,
+    isRelease: kReleaseMode,
+    ref: ref,
+  );
 });
 
 // Granular Repository Providers (mapped from EssRepository)

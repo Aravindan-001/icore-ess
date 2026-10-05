@@ -2,6 +2,23 @@
 
 All notable changes to the ESS Application (ebaConnect / iCore ESS) project are documented in this file.
 
+## [1.0.1] - Security Hardening & Audit Closure
+
+### Security
+- **Backend Selection Hardening (AUTH-CONFIG-001)**: Implemented fail-closed environment selection prohibiting mock backend instantiation in release builds.
+- **Release Signing Enforcement (BUILD-KEY-001)**: Enforced strict Gradle `key.properties` checking for release tasks to prevent debug-signing fallbacks.
+- **Role Authorization Guard (AUTHZ-001)**: Protected all HR administrative routes (`/hr/dashboard`, `/hr/employees`, `/hr/leaves`, `/hr/payslips`) with `HrRouteGuard`.
+- **Session Validation & Cleanup (SESSION-001, SESSION-002)**: Enforced multi-attribute session validation and guaranteed local session clearing upon logout regardless of remote service response.
+- **Transport Security (SOAP-001)**: Enforced mandatory HTTPS scheme validation for SOAP endpoint URIs.
+- **PDF Path Traversal Protection (PDF-001)**: Added allowlist regex sanitization for payslip PDF filenames restricting output to temporary storage directories.
+- **Telemetry & Log Sanitation (LOG-001)**: Omitted sensitive parameters, tokens, credentials, PII, and payroll amounts from analytics and application logs.
+- **Dependency Audit (DEP-001)**: Completed dependency review and updated `cupertino_icons` (`^1.0.9`). Zero actionable CVEs found.
+
+### Verified Status
+- **Static Analysis**: `flutter analyze` — 0 issues.
+- **Automated Tests**: 148 / 148 passing tests.
+- **Pending Validation**: Production deployment requires client SOAP/WSDL delivery and production signing keystore setup.
+
 ## [1.0.0] - Production QA & Hardening Milestone
 
 ### Added
@@ -34,7 +51,7 @@ All notable changes to the ESS Application (ebaConnect / iCore ESS) project are 
   - My Documents screen featuring direct Payslip PDF deep-linking.
 
 - **Phase 11F - Production QA & Hardening**:
-  - Complete automated test coverage across 27 test files (99/99 passing tests).
+  - Complete automated test coverage across 27 test files.
   - Clean static analysis (`flutter analyze` with 0 issues).
   - Verified debug APK build and Android release minification/shrinking (R8/Proguard).
   - Comprehensive technical architecture documentation (`ARCHITECTURE.md`).

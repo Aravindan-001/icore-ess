@@ -67,10 +67,31 @@ class SessionManager {
     await _storage.delete(key: _keyRememberedId);
   }
 
-  /// Checks if a valid session exists.
+  /// Checks if a valid, complete session exists.
+  /// Requires both a valid auth handle (token or sessionId) and full user identity (employeeId and userRole).
+  /// If an incomplete or inconsistent session state is detected, clears the invalid session data safely and returns false.
   static Future<bool> hasSession() async {
     final token = await getToken();
     final sessionId = await getSessionId();
-    return token != null || sessionId != null;
+    final employeeId = await getEmployeeId();
+    final role = await getUserRole();
+
+    final hasAuthIdentifier = (token != null && token.trim().isNotEmpty) ||
+        (sessionId != null && sessionId.trim().isNotEmpty);
+
+    final hasUserIdentity = (employeeId != null && employeeId.trim().isNotEmpty) &&
+        (role != null && role.trim().isNotEmpty);
+
+    final isValid = hasAuthIdentifier && hasUserIdentity;
+
+    if (!isValid) {
+      // Safely wipe out any partial or stale session data
+      if (token != null || sessionId != null || employeeId != null || role != null) {
+        await clearSession();
+      }
+      return false;
+    }
+
+    return true;
   }
 }

@@ -1,3 +1,5 @@
+import '../../core/errors/app_exceptions.dart';
+
 enum AppEnvironment {
   development,
   uat,
@@ -15,7 +17,31 @@ class SoapConfig {
     required this.baseUrl,
     this.connectTimeout = const Duration(seconds: 30),
     this.receiveTimeout = const Duration(seconds: 30),
-  });
+  }) {
+    validateEndpoint(baseUrl);
+  }
+
+  /// Centralized endpoint URI validation enforcing mandatory HTTPS scheme.
+  /// Rejects HTTP schemes, empty URLs, and malformed URIs.
+  static String validateEndpoint(String url) {
+    final trimmed = url.trim();
+    if (trimmed.isEmpty) {
+      throw ConfigurationException('SOAP endpoint URL cannot be empty.');
+    }
+
+    final uri = Uri.tryParse(trimmed);
+    if (uri == null || !uri.hasScheme || !uri.hasAuthority || uri.host.isEmpty) {
+      throw ConfigurationException('Invalid SOAP endpoint URI format: $url');
+    }
+
+    if (uri.scheme.toLowerCase() != 'https') {
+      throw ConfigurationException(
+        'Insecure SOAP transport endpoint rejected: $url. HTTPS scheme is mandatory.',
+      );
+    }
+
+    return trimmed;
+  }
 
   // Factory methods for predefined environments
   // IMPORTANT: Do NOT hardcode real production endpoints here.

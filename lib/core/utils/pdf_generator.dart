@@ -172,9 +172,30 @@ class PdfGenerator {
     } catch (_) {
       output = Directory.systemTemp;
     }
-    final file = File("${output.path}/payslip_${detail.payPeriod}.pdf");
+    final filename = sanitizePayslipFilename(detail.payPeriod);
+    final file = File("${output.path}/$filename");
     await file.writeAsBytes(await pdf.save());
     return file;
+  }
+
+  /// Sanitizes raw backend period strings into a safe filename.
+  /// Enforces a strict allowlist (alphanumeric, hyphen, underscore).
+  /// Strips slashes, backslashes, path traversals, and special characters.
+  /// Returns 'payslip.pdf' for empty, null, or sanitized-to-empty inputs.
+  static String sanitizePayslipFilename(String? payPeriod) {
+    if (payPeriod == null || payPeriod.trim().isEmpty) {
+      return 'payslip.pdf';
+    }
+
+    // Allow only alphanumeric, hyphen, and underscore characters
+    final RegExp allowlist = RegExp(r'[^a-zA-Z0-9\-_]');
+    final sanitizedPeriod = payPeriod.replaceAll(allowlist, '').trim();
+
+    if (sanitizedPeriod.isEmpty) {
+      return 'payslip.pdf';
+    }
+
+    return 'payslip_$sanitizedPeriod.pdf';
   }
 
   static pw.Widget _buildPdfHeaderCell(String text, {bool alignRight = false}) {

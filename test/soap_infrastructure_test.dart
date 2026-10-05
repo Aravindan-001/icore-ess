@@ -15,9 +15,39 @@ void main() {
       expect(uatConfig.environment, AppEnvironment.uat);
       expect(prodConfig.environment, AppEnvironment.production);
 
+      expect(devConfig.baseUrl, startsWith('https://'));
+      expect(uatConfig.baseUrl, startsWith('https://'));
+      expect(prodConfig.baseUrl, startsWith('https://'));
+
       expect(devConfig.baseUrl, contains('dev-ess.ebaconnect.com'));
       expect(uatConfig.baseUrl, contains('uat-ess.ebaconnect.com'));
       expect(prodConfig.baseUrl, contains('ess.ebaconnect.com'));
+    });
+
+    test('SOAP-001: HTTPS scheme is strictly enforced, HTTP and invalid endpoints are rejected', () {
+      // Valid HTTPS endpoints succeed
+      expect(
+        () => SoapConfig(environment: AppEnvironment.production, baseUrl: 'https://ess.ebaconnect.com/services'),
+        returnsNormally,
+      );
+
+      // Insecure HTTP endpoint rejected
+      expect(
+        () => SoapConfig(environment: AppEnvironment.production, baseUrl: 'http://ess.ebaconnect.com/services'),
+        throwsA(isA<ConfigurationException>()),
+      );
+
+      // Empty endpoint rejected
+      expect(
+        () => SoapConfig(environment: AppEnvironment.production, baseUrl: '   '),
+        throwsA(isA<ConfigurationException>()),
+      );
+
+      // Malformed URI rejected
+      expect(
+        () => SoapConfig(environment: AppEnvironment.production, baseUrl: 'not_a_valid_url'),
+        throwsA(isA<ConfigurationException>()),
+      );
     });
 
     test('SoapClient wrapInEnvelope generates syntactically valid generic envelope structure', () {

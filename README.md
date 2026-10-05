@@ -16,7 +16,7 @@
   <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-%5E3.12.1-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter"/></a>
   <a href="https://dart.dev"><img src="https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart"/></a>
   <a href="https://github.com/Aravindan-001/icore-ess/actions"><img src="https://img.shields.io/badge/CI-Passing-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI Status"/></a>
-  <a href="#quality--ci"><img src="https://img.shields.io/badge/Tests-99%2F99%20Passing-2ea44f?style=for-the-badge&logo=flutter&logoColor=white" alt="Tests Passed"/></a>
+  <a href="#quality--ci"><img src="https://img.shields.io/badge/Tests-148%2F148%20Passing-2ea44f?style=for-the-badge&logo=flutter&logoColor=white" alt="Tests Passed"/></a>
   <a href="#quality--ci"><img src="https://img.shields.io/badge/Analyze-0%20Issues-2ea44f?style=for-the-badge&logo=dart&logoColor=white" alt="Analysis Clean"/></a>
 </p>
 
@@ -43,9 +43,9 @@
 
 ## Overview
 
-**ebaConnect (iCore ESS)** is a enterprise Employee Self-Service (ESS) mobile application built with **Flutter** and **Dart**. The system streamlines workforce operations including location-based GPS attendance, leave applications, unified request management, payroll and payslip inspection, structured PDF document generation, and HR administration.
+**ebaConnect (iCore ESS)** is an enterprise Employee Self-Service (ESS) mobile application built with **Flutter** and **Dart**. The system streamlines workforce operations including location-based GPS attendance, leave applications, unified request management, payroll and payslip inspection, structured PDF document generation, and HR administration.
 
-The mobile application is fully developed and hardened operating against a deterministic mock repository. The system is architecturally prepared for client SOAP/XML web service integration via `--dart-define=ESS_BACKEND=soap`.
+The mobile application is fully developed, security hardened, and verified operating against a deterministic mock repository. The system is architecturally prepared for client SOAP/XML web service integration via `--dart-define=ESS_BACKEND=soap`.
 
 ---
 
@@ -57,8 +57,9 @@ The mobile application is fully developed and hardened operating against a deter
 | **Role Support** | Employee & HR Administrator Roles |
 | **Current Backend** | Deterministic Mock Repository (Active) |
 | **SOAP/XML Integration** | Prepared Transport Layer (`ESS_BACKEND=soap`) |
+| **Security Hardening** | Client-Side Hardening Complete (9 Audit Findings Resolved) |
 | **Firebase Services** | Analytics + Crashlytics Configured |
-| **Automated Tests** | 99 / 99 Tests Passing (0 Failures) |
+| **Automated Tests** | 148 / 148 Tests Passing (0 Failures) |
 | **Static Analysis** | `flutter analyze` — 0 Issues |
 | **Debug APK Build** | Successful Gradle Compilation |
 | **Client WSDL** | Pending Client Delivery |
@@ -87,7 +88,7 @@ The mobile application is fully developed and hardened operating against a deter
 - **Employee Management**: Roster view of employees with profile inspection capability.
 - **Leave Management**: Approval/rejection workflow for pending employee leave applications.
 - **Payroll & Payslip Management**: Organization-wide employee payslips inspection and earnings review.
-- **Role Isolation**: Role-based access control protecting HR workflows from general employee accounts.
+- **Role Isolation**: Role-based route guard (`HrRouteGuard`) protecting HR workflows from general employee accounts.
 
 ---
 
@@ -186,53 +187,11 @@ flowchart TD
 | Check | Result | Specification / Details |
 | :--- | :---: | :--- |
 | **Static Analysis** | **0 Issues** | Verified via `flutter analyze` |
-| **Automated Tests** | **99 / 99 Passed** | 27 test files covering unit, widget, and provider tests |
+| **Automated Tests** | **148 / 148 Passed** | Unit, widget, provider, route guard, PDF, and security tests |
 | **Debug APK Build** | **Success** | Compiled via `flutter build apk --debug` |
 | **GitHub Actions CI** | **Passing** | Automated workflow on Ubuntu 24.04 with Java 17 |
 | **Crashlytics** | **Configured** | Fatal and non-fatal error telemetry handler attached |
 | **Analytics** | **Configured** | Safe business telemetry mapped to Firebase Analytics |
-
-### CI Pipeline Workflow
-
-```mermaid
-flowchart LR
-    PUSH["Push / PR to main"] --> CHECKOUT["Checkout Code"]
-    CHECKOUT --> JAVA["Set up Java 17 (Temurin)"]
-    JAVA --> FLUTTER["Set up Flutter (Stable)"]
-    FLUTTER --> PUB["flutter pub get"]
-    PUB --> ANALYZE["flutter analyze"]
-    ANALYZE --> TEST["flutter test"]
-    TEST --> BUILD["flutter build apk --debug"]
-    BUILD --> UPLOAD["Upload app-debug-apk Artifact"]
-```
-
-The GitHub Actions workflow (`.github/workflows/flutter-ci.yml`) automatically validates code quality, executes tests, builds the debug APK, and archives the build artifact on every push or pull request to `main`.
-
----
-
-## Project Progress
-
-```
-Phase 1 — Navigation Architecture       [COMPLETE]
-Phase 2 — Home Dashboard                 [COMPLETE]
-Phase 3 — Personal Information           [COMPLETE]
-Phase 4 — Salary & Benefits              [COMPLETE]
-Phase 5 — Leave Management               [COMPLETE]
-Phase 6 — Attendance Management           [COMPLETE]
-Phase 7 — Requests & Workflow             [COMPLETE]
-Phase 8 — Notifications & Alerts         [COMPLETE]
-Phase 9 — Architectural Cleanup           [COMPLETE]
-Phase 10 — Firebase / Branding            [COMPLETE]
-Phase 11A — Attendance Experience        [COMPLETE]
-Phase 11B — Notifications UX             [COMPLETE]
-Phase 11C — Request Center               [COMPLETE]
-Phase 11D — Payroll & Payslips            [COMPLETE]
-Phase 11E — Profile & Documents           [COMPLETE]
-Phase 11F — Production Hardening          [COMPLETE]
-```
-
-- **Current Milestone**: Client SOAP/WSDL Integration
-- **Pending Deliverables**: Client WSDL → Operation Mapping → SOAP Repository Integration → UAT Testing → Release Validation
 
 ---
 
@@ -268,82 +227,19 @@ Phase 11F — Production Hardening          [COMPLETE]
 
 ---
 
-## Repository Structure
-
-```
-lib/
-├── app.dart                        # MaterialApp configuration, theme & route generator
-├── main.dart                       # Entry point & Firebase initialization
-├── core/                           # Application core infrastructure
-│   ├── constants/                  # Office GPS coordinates, routes & spacing tokens
-│   ├── errors/                     # AppExceptions & failure models
-│   ├── providers/                  # Dependency injection providers
-│   ├── services/                   # Analytics service abstraction
-│   ├── theme/                      # AppTheme Material Design 3 setup
-│   ├── utils/                      # SessionManager, PdfGenerator & AppLogger
-│   └── widgets/                    # Reusable UI widgets
-├── features/                       # Feature modules
-│   ├── attendance/                 # GPS attendance screen & geofence widgets
-│   ├── auth/                       # Login screen & bootstrap handler
-│   ├── dashboard/                  # Home dashboard, metrics & shortcuts
-│   ├── hr/                         # HR dashboard, roster & approvals
-│   ├── leave/                      # Leave balances & application form
-│   ├── notifications/              # Notifications list & category filtering
-│   ├── payslip/                    # Payslip history & detail breakdown
-│   ├── profile/                    # Personal info landing & 10 sub-sections
-│   └── requests/                   # Unified request center across 7 domains
-├── models/                         # Domain data models (Employee, Attendance, Payslip, etc.)
-├── navigation/                     # Main navigation hub & bottom bar
-├── repositories/                   # Abstract contracts & repository implementations
-│   ├── ess_repository.dart         # EssRepository interface contract
-│   ├── mock_ess_repository.dart    # Active deterministic mock implementation
-│   └── soap_ess_repository.dart    # Prepared SOAP/XML repository
-└── services/                       # Business services & transport layers
-    ├── attendance_service.dart     # Attendance rules & geofence check
-    ├── location_service.dart       # Device GPS hardware interface
-    ├── requests_service.dart       # Request aggregator
-    └── soap/                       # SoapClient, XmlUtils & SoapConfig
-
-test/                               # 27 test files (99 passing tests)
-assets/                             # Branding assets and images
-.github/workflows/flutter-ci.yml    # GitHub Actions CI pipeline
-ARCHITECTURE.md                     # Architecture documentation
-BACKEND_INTEGRATION.md              # Backend integration guide
-PRODUCTION_READINESS.md             # Production hardening checklist
-SECURITY.md                         # Security policy
-SECURITY_AUDIT.md                   # Security audit report
-```
-
----
-
-## Next Integration Milestone
-
-```mermaid
-flowchart TD
-    WSDL["Receive Client WSDL Specification"] --> MAP["Map SOAP Operations & XML Schemas"]
-    MAP --> CFG["Configure SoapClient Endpoints"]
-    CFG --> REPO["Wire SoapEssRepository to Endpoints"]
-    REPO --> UAT["Provision UAT Credentials & Test"]
-    UAT --> E2E["End-to-End Functional Verification"]
-    E2E --> REL["Release Validation & Deployment"]
-```
-
----
-
 ## Tech Stack
 
 | Layer | Technology | Version / Details |
 | :--- | :--- | :--- |
 | **Framework** | Flutter | SDK `^3.12.1` |
 | **Language** | Dart | 3.x |
-| **UI Framework** | Material Design 3 | Light Theme, Google Fonts `^8.2.1`, Cupertino Icons `^1.0.8` |
+| **UI Framework** | Material Design 3 | Light Theme, Google Fonts `^8.2.1`, Cupertino Icons `^1.0.9` |
 | **State Management** | Riverpod | `flutter_riverpod: ^2.6.1` |
 | **Backend Architecture** | Repository Pattern | Toggleable via `--dart-define=ESS_BACKEND` |
 | **Session & Storage** | Flutter Secure Storage | `flutter_secure_storage: ^9.2.4` via `SessionManager` |
 | **Location & GPS** | Geolocator | `geolocator: ^13.0.4` |
 | **PDF Generation** | PDF & Printing | `pdf: ^3.11.1`, `printing: ^5.11.1`, `share_plus: ^10.1.3` |
 | **Telemetry** | Firebase | Analytics (`firebase_analytics`) & Crashlytics (`firebase_crashlytics`) |
-| **CI / Automation** | GitHub Actions | Runner `ubuntu-24.04`, Java 17 Temurin, Flutter Stable |
 | **Target OS** | Android | Gradle KTS, Java JVM 17 |
 
 ---
@@ -363,7 +259,7 @@ flowchart TD
 
 > **Current Status**
 >
-> Flutter application QA and hardening complete.
+> Flutter application QA and security hardening complete.
 > The application operates against the active deterministic mock repository and is architecturally prepared for SOAP/XML integration.
 >
 > **Next Blocker**: Client WSDL, SOAP operation contracts, endpoint configuration, XML schemas, and UAT credentials.

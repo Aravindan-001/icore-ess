@@ -4,6 +4,8 @@ import '../repositories/auth_repository.dart';
 import '../core/utils/session_manager.dart';
 import '../core/constants/app_constants.dart';
 
+import '../core/utils/logger.dart';
+
 class AuthService {
   final AuthRepository _authRepo;
 
@@ -33,14 +35,18 @@ class AuthService {
   }
 
   Future<void> logout(BuildContext context) async {
-    await _authRepo.logout();
-    await SessionManager.clearSession();
-    
-    if (context.mounted) {
-      Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
-        AppConstants.loginRoute, 
-        (route) => false,
-      );
+    try {
+      await _authRepo.logout();
+    } catch (e) {
+      AppLogger.error('Remote logout failed, proceeding with local session cleanup');
+    } finally {
+      await SessionManager.clearSession();
+      if (context.mounted) {
+        Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
+          AppConstants.loginRoute,
+          (route) => false,
+        );
+      }
     }
   }
 

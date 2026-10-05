@@ -49,13 +49,9 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = if (keystorePropertiesFile.exists()) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
-            }
+            // Production release builds must use the release signing configuration.
+            // Fallback to debug signing in release builds is strictly prohibited.
+            signingConfig = signingConfigs.getByName("release")
 
             // Enable R8 for production hardening
             isMinifyEnabled = true
@@ -76,4 +72,30 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+gradle.taskGraph.whenReady {
+    val isReleaseBuild = allTasks.any { task ->
+        val name = task.name.lowercase()
+        (name.contains("assemblerelease") ||
+         name.contains("bundlerelease") ||
+         name.contains("packagerelease") ||
+         name.contains("signrelease") ||
+         name.contains("flutterbuildrelease"))
+    }
+    if (isReleaseBuild) {
+        if (!keystorePropertiesFile.exists()) {
+            throw GradleException(
+                "RELEASE BUILD ERROR: Production signing configuration 'key.properties' was not found in root project directory. " +
+                "Release builds strictly require production signing credentials and will not fall back to debug signing."
+            )
+        }
+        val storeFilePath = keystoreProperties["storeFile"] as String?
+        if (storeFilePath.isNullOrBlank() || !file(storeFilePath).exists()) {
+            throw GradleException(
+                "RELEASE BUILD ERROR: Keystore file '${storeFilePath ?: "unspecified"}' defined in key.properties was not found or not specified. " +
+                "Release builds strictly require a valid production keystore."
+            )
+        }
+    }
 }

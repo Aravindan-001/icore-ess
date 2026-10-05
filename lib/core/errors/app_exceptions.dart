@@ -62,3 +62,7 @@ class IntegrationException extends AppException {
 class LocationException extends AppException {
   LocationException(String message) : super(message, 'Location Error: ');
 }
+
+class ConfigurationException extends AppException {
+  ConfigurationException(String message) : super(message, 'Configuration Error: ');
+}

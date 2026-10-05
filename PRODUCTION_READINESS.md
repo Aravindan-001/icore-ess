@@ -1,27 +1,29 @@
-# ESS Application - Production Readiness Status
+# ESS Application — Production Readiness Status
 
-This document tracks the readiness of the ESS Application (ebaConnect / iCore ESS) mobile application for enterprise production release.
+This document tracks the readiness of the ESS Application (**ebaConnect / iCore ESS**) mobile application for enterprise production release.
 
 ---
 
 ## 1. Readiness Summary
 
-- **Overall Status**: Flutter application QA and hardening complete; pending client SOAP/WSDL integration and environment-specific release validation.
+- **Overall Status**: Client-side application QA, security hardening, and feature specifications complete. Production deployment is pending client SOAP/WSDL backend delivery and production release signing setup.
 - **Mobile UI/UX Readiness**: Verified (Material 3, responsive layouts across standard & small screens).
 - **Client Logic & State Management**: Verified (Riverpod providers, deterministic Mock repository, offline sandbox validation).
+- **Security Hardening**: Complete on client side (Fail-closed release backend selection, route guards, session validation, path traversal protection, log sanitation).
 - **Backend Infrastructure Readiness**: Prepared (`SoapClient`, `SoapConfig`, `XmlUtils`, `SoapEssRepository`, environment toggle `ESS_BACKEND=soap`).
-- **Quality Assurance**: 99 / 99 Automated Tests Passing | 0 `flutter analyze` Static Analysis Issues | Debug APK Build Verified.
+- **Quality Assurance**: 148 / 148 Automated Tests Passing | 0 `flutter analyze` Static Analysis Issues | Debug APK Build Verified.
 
 ---
 
 ## 2. Verified Completed Work (Mobile Side)
 
 - [x] **Branding & Theme**: Material 3 light theme, primary blue palette, Google Fonts, Cupertino icons, and native splash branding.
-- [x] **Authentication & Session Lifecycle**: `FlutterSecureStorage` session token handling, Remember Me (storing Employee ID without plain-text passwords), role isolation (Employee vs. HR Admin), password change, and logout session clearing.
+- [x] **Authentication & Session Lifecycle**: `FlutterSecureStorage` encrypted session handling (`SessionManager`), Remember Me (storing Employee ID without plain-text passwords), role-based route guard (`HrRouteGuard`), password change, and logout session clearing.
+- [x] **Security Hardening**: Fail-closed release backend selection (`AUTH-CONFIG-001`), production signing Gradle enforcement (`BUILD-KEY-001`), HR route protection (`AUTHZ-001`), session completeness checking (`SESSION-001`), guaranteed local logout cleanup (`SESSION-002`), HTTPS endpoint validation (`SOAP-001`), PDF path traversal sanitization (`PDF-001`), telemetry/log sanitation (`LOG-001`), and dependency audit (`DEP-001`).
 - [x] **GPS Attendance & Geofence**: Real device GPS tracking via Geolocator, 50-meter geofence calculation, 100-meter accuracy threshold validation, sequential state control (`notMarked` -> `checkedIn` -> `completed`), location error handling, and `attendance_marked` telemetry.
 - [x] **Notifications & Alerts**: Top app bar unread count badge, category filters (System, Leave, Payroll, General), unread filter, pull-to-refresh, mark single/all as read, and deep-link navigation with `notification_opened` telemetry.
 - [x] **Unified Request Center**: Aggregated request hub across 7 domains (Leave, Overtime, Airfare, Education, Profile Update, Medical Claims, Reimbursements), category & status filtering (Pending/Approved/Rejected), and summary metric cards.
-- [x] **Payroll & Payslips**: Payslip history, year filtering, structured detail card, net pay arithmetic verification (Net Pay = Earnings - Deductions), Pay Summary with YTD metrics & month selector, vector A4 PDF generation (`PdfGenerator`), local temporary storage, and file sharing/downloading via `share_plus`.
+- [x] **Payroll & Payslips**: Payslip history, year filtering, structured detail card, net pay arithmetic verification (Net Pay = Earnings - Deductions), Pay Summary with YTD metrics & month selector, vector A4 PDF generation (`PdfGenerator`), local temporary storage with filename sanitization, and file sharing/downloading via `share_plus`.
 - [x] **Profile & Documents**: Profile summary, employment details, Personal Information landing with 10 sub-sections, and My Documents screen with direct Payslip PDF navigation.
 - [x] **HR Administration**: HR Dashboard, Employee management list & profile inspection, Leave request approvals/rejections, and HR Payslip management.
 - [x] **Firebase Integration**: `firebase_core` platform init, `firebase_crashlytics` fatal & async error logging with custom keys, and `firebase_analytics` event tracking (`login_success`, `attendance_marked`, `request_submitted`, `notification_opened`).
@@ -38,17 +40,17 @@ This document tracks the readiness of the ESS Application (ebaConnect / iCore ES
 - [x] **Phase 11C - Request Center**: COMPLETE
 - [x] **Phase 11D - Payroll / Payslips**: COMPLETE
 - [x] **Phase 11E - Profile / Documents**: COMPLETE
-- [x] **Phase 11F - Production QA & Hardening**: COMPLETE
+- [x] **Phase 11F - Production QA & Security Hardening**: COMPLETE
 
 ---
 
-## 4. Pending Production Prerequisites (Client Backend Blockers)
+## 4. Pending External Production Prerequisites
 
-### A. Backend Integration Prerequisites
+### A. Backend Integration Prerequisites (Client Delivery Needed)
 - [ ] **Client WSDL / Service Contracts**: Official WSDL definition files or URLs and operation XML schemas.
 - [ ] **SOAP Endpoints**: Verified UAT and Production SOAP service URLs.
 - [ ] **Authentication Contract**: SOAP security headers, tokens, or session ID format expected by the client backend.
-- [ ] **Server-Side Validation**: Server-side geofence coordinate validation and business rule enforcement.
+- [ ] **Server-Side Validation**: Server-side geofence coordinate validation, role authorization, and session expiration enforcement.
 
 ### B. Enterprise Security & Release Signing
 - [ ] **SSL Certificate Pinning**: Configuration of custom CA certificates or certificate pinning if required by client enterprise policy.

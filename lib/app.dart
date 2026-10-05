@@ -44,6 +44,7 @@ import 'features/hr/hr_dashboard_screen.dart';
 import 'features/hr/hr_employee_list_screen.dart';
 import 'features/hr/hr_leave_requests_screen.dart';
 import 'features/hr/hr_payslip_mgmt_screen.dart';
+import 'core/widgets/hr_route_guard.dart';
 import 'navigation/main_navigation.dart';
 
 class ICoreEssApp extends ConsumerWidget {
@@ -92,11 +93,11 @@ class ICoreEssApp extends ConsumerWidget {
         AppConstants.workHistoryRoute: (context) => const WorkHistoryScreen(),
         AppConstants.certificatesRoute: (context) => const CertificatesScreen(),
         AppConstants.profileRequestsRoute: (context) => const ProfileRequestsScreen(),
-        // HR Specific Routes
-        AppConstants.hrDashboardRoute: (context) => const HrDashboardScreen(),
-        AppConstants.hrEmployeesRoute: (context) => const HrEmployeeListScreen(),
-        AppConstants.hrLeavesRoute: (context) => const HrLeaveRequestsScreen(),
-        AppConstants.hrPayslipsRoute: (context) => const HrPayslipMgmtScreen(),
+        // HR Specific Routes guarded by HrRouteGuard
+        AppConstants.hrDashboardRoute: (context) => const HrRouteGuard(child: HrDashboardScreen()),
+        AppConstants.hrEmployeesRoute: (context) => const HrRouteGuard(child: HrEmployeeListScreen()),
+        AppConstants.hrLeavesRoute: (context) => const HrRouteGuard(child: HrLeaveRequestsScreen()),
+        AppConstants.hrPayslipsRoute: (context) => const HrRouteGuard(child: HrPayslipMgmtScreen()),
       },
       onGenerateRoute: (settings) {
         if (settings.name == AppConstants.payslipDetailRoute) {
